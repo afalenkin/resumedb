@@ -5,43 +5,37 @@ import java.util.Arrays;
  */
 public class ArrayStorage {
     Resume[] storage = new Resume[10000];
-    int resumeCount = 0; // индекс последнего резюме в хранилище
+    int resumeCount = 0; // количество резюме в хранилище
 
     void clear() {
-        Arrays.fill(storage, null);
+        Arrays.fill(storage, 0, resumeCount, null );
         resumeCount = 0;
     }
 
     void save(Resume r) {
-        for (int i = 0; i < storage.length; i++) {
-            if ( (storage[i] != null) && storage[i].uuid.equals(r.uuid)) {
+        for (int i = 0; i < resumeCount; i++) {
+            if ( storage[i].uuid.equals(r.uuid)) {
                 System.out.println("База уже содержит резюме с таким ID");
-                break;
-            }
-            if (storage[i] == null) {
-                storage[i] = r;
-                resumeCount = i;
                 return;
             }
         }
+        storage[resumeCount] = r;
+        resumeCount++;
     }
 
     Resume get(String uuid) {
-        if (resumeCount > 0) {
-            for (int i = 0; i < resumeCount + 1; i++) {
+        for (int i = 0; i < resumeCount; i++) {
                 if (storage[i].uuid.equals(uuid)) {
                     return storage[i];
                 }
             }
-        }
         System.out.println("Резюме с таким ID отсутствует в базе");
         return null;
     }
 
     void delete(String uuid) {
-        if (resumeCount > 0) {
-            boolean deleted = false;
-            for (int i = 0; i < resumeCount + 1; i++) {
+        boolean deleted = false;
+            for (int i = 0; i < resumeCount; i++) {
                 if (storage[i].uuid.equals(uuid)) { // удаляем резюме с нужным uuid
                     storage[i] = null;
                     deleted = true;
@@ -51,7 +45,6 @@ public class ArrayStorage {
                     storage[i] = storage[i + 1];
                 }
             }
-        }
 
     }
 
@@ -59,19 +52,13 @@ public class ArrayStorage {
      * @return array, contains only Resumes in storage (without null)
      */
     Resume[] getAll() {
-        if (resumeCount > 0 || storage[0] != null) {
-            Resume[] result = new Resume[resumeCount + 1];
-            System.arraycopy(storage, 0, result, 0, resumeCount + 1);
+            Resume[] result = new Resume[resumeCount];
+            System.arraycopy(storage, 0, result, 0, resumeCount);
             return result;
-        } else {
-            return new Resume[0];
-        }
+
     }
 
     int size() {
-        if (resumeCount > 0) {
-            return (resumeCount + 1);
-        }
-        return 0;
+        return resumeCount;
     }
 }
