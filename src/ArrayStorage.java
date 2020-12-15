@@ -14,6 +14,10 @@ public class ArrayStorage {
 
     void save(Resume r) {
         for (int i = 0; i < storage.length; i++) {
+            if ( (storage[i] != null) && storage[i].uuid.equals(r.uuid)) {
+                System.out.println("База уже содержит резюме с таким ID");
+                break;
+            }
             if (storage[i] == null) {
                 storage[i] = r;
                 resumeCount = i;
@@ -30,6 +34,7 @@ public class ArrayStorage {
                 }
             }
         }
+        System.out.println("Резюме с таким ID отсутствует в базе");
         return null;
     }
 
@@ -54,7 +59,7 @@ public class ArrayStorage {
      * @return array, contains only Resumes in storage (without null)
      */
     Resume[] getAll() {
-        if (resumeCount > 0) {
+        if (resumeCount > 0 || storage[0] != null) {
             Resume[] result = new Resume[resumeCount + 1];
             System.arraycopy(storage, 0, result, 0, resumeCount + 1);
             return result;
