@@ -27,12 +27,27 @@ public class MainTestArrayStorage {
         System.out.println("Get dummy: " + ARRAY_STORAGE.get("dummy"));
 
         printAll();
+
+        Resume resume1 = new Resume();
+        resume1.setUuid("uuid3");
+        ARRAY_STORAGE.update(resume1);
+        printAll();
+
+        Resume resume2 = new Resume();
+        resume2.setUuid("uuid30");
+        ARRAY_STORAGE.update(resume2);
+        printAll();
+
         ARRAY_STORAGE.delete(r1.getUuid());
         printAll();
         ARRAY_STORAGE.clear();
         printAll();
 
         System.out.println("Size: " + ARRAY_STORAGE.size());
+
+
+
+
     }
 
     static void printAll() {
@@ -41,4 +56,5 @@ public class MainTestArrayStorage {
             System.out.println(r);
         }
     }
+
 }
