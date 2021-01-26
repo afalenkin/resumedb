@@ -20,7 +20,7 @@ public class SortedArrayStorage extends AbstractArrayStorage {
 
     @Override
     protected int getIndex(String uuid) {
-        if (resumeCount < 1) return -1;
+        if (resumeCount < 1 || uuid.isEmpty()) return -1;
         Resume search = new Resume();
         search.setUuid(uuid);
         return Arrays.binarySearch(storage, 0, resumeCount, search);

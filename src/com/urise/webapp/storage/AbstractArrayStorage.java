@@ -7,7 +7,9 @@ import java.util.Arrays;
 public abstract class AbstractArrayStorage implements Storage {
     protected static final int STORAGE_LIMIT = 10_000;
     protected Resume[] storage = new Resume[STORAGE_LIMIT];
-    protected int resumeCount = 0; // количество резюме в хранилище
+
+    // количество резюме в хранилище
+    protected int resumeCount = 0;
 
     public int size() {
         return resumeCount;
@@ -31,6 +33,7 @@ public abstract class AbstractArrayStorage implements Storage {
             return;
         }
         localDelete(index);
+        storage[resumeCount] = null;
         resumeCount--;
     }
 
@@ -56,11 +59,6 @@ public abstract class AbstractArrayStorage implements Storage {
     public void save(Resume resume) {
         if (resumeCount == STORAGE_LIMIT) {
             System.out.println("Warning! Storage is crowded");
-            return;
-        }
-        if (resumeCount == 0) {
-            storage[0] = resume;
-            resumeCount++;
             return;
         }
         int position = getIndex(resume.getUuid());

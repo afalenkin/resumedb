@@ -10,7 +10,6 @@ public class ArrayStorage extends AbstractArrayStorage {
     @Override
     protected void localDelete(int index) {
         storage[index] = storage[resumeCount - 1];
-        storage[resumeCount] = null;
     }
 
 
