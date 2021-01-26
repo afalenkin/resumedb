@@ -18,20 +18,20 @@ public abstract class AbstractArrayStorage implements Storage {
         resumeCount = 0;
     }
 
+    public Resume[] getAll() {
+        Resume[] result = new Resume[resumeCount];
+        System.arraycopy(storage, 0, result, 0, resumeCount);
+        return result;
+    }
+
     public void delete(String uuid) {
         int index = getIndex(uuid);
         if (index < 0) {
             System.out.println("ERROR. Storage does not contain resume with uuid = " + uuid);
             return;
         }
-        System.arraycopy(storage, (index + 1), storage, index, (resumeCount - index));
+        localDelete(index);
         resumeCount--;
-    }
-
-    public Resume[] getAll() {
-        Resume[] result = new Resume[resumeCount];
-        System.arraycopy(storage, 0, result, 0, resumeCount);
-        return result;
     }
 
     public Resume get(String uuid) {
@@ -52,6 +52,29 @@ public abstract class AbstractArrayStorage implements Storage {
         storage[index] = resume;
 
     }
+
+    public void save(Resume resume) {
+        if (resumeCount == STORAGE_LIMIT) {
+            System.out.println("Warning! Storage is crowded");
+            return;
+        }
+        if (resumeCount == 0) {
+            storage[0] = resume;
+            resumeCount++;
+            return;
+        }
+        int position = getIndex(resume.getUuid());
+        if (position > 0) {
+            System.out.println("ERROR. Storage currently contains resume with uuid = " + resume.getUuid());
+        } else {
+            localSave(position, resume);
+            resumeCount++;
+        }
+    }
+
+    protected abstract void localSave(int position, Resume resume);
+
+    protected abstract void localDelete(int index);
 
     protected abstract int getIndex(String uuid);
 

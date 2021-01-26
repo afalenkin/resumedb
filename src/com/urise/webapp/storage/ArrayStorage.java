@@ -5,20 +5,18 @@ import com.urise.webapp.model.Resume;
 /**
  * Array based storage for Resumes
  */
-public class ArrayStorage extends AbstractArrayStorage{
+public class ArrayStorage extends AbstractArrayStorage {
 
     @Override
-    public void save(Resume resume) {
-        if (resumeCount == STORAGE_LIMIT) {
-            System.out.println("Warning! Storage is crowded");
-            return;
-        }
-        if (getIndex(resume.getUuid()) < 0) {
-            storage[resumeCount] = resume;
-            resumeCount++;
-        } else {
-            System.out.println("ERROR. Storage currently contains resume with uuid = " + resume.getUuid());
-        }
+    protected void localDelete(int index) {
+        storage[index] = storage[resumeCount - 1];
+        storage[resumeCount] = null;
+    }
+
+
+    @Override
+    protected void localSave(int position, Resume resume) {
+        storage[resumeCount] = resume;
     }
 
     @Override
@@ -31,5 +29,4 @@ public class ArrayStorage extends AbstractArrayStorage{
         }
         return -1;
     }
-
 }
