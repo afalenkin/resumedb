@@ -11,14 +11,10 @@ public class TestSortedArrayStorage {
         System.out.println("Testing SortedArrayStorage");
         Storage sortedStorage = new SortedArrayStorage();
 
-        Resume res1 = new Resume();
-        res1.setUuid("D");
-        Resume res2 = new Resume();
-        res2.setUuid("B");
-        Resume res3 = new Resume();
-        res3.setUuid("A");
-        Resume res4 = new Resume();
-        res4.setUuid("C");
+        Resume res1 = new Resume("D");
+        Resume res2 = new Resume("B");
+        Resume res3 = new Resume("A");
+        Resume res4 = new Resume("C");
 
         System.out.println("Get Dummy = " + SORTED_STORAGE.get("Dummy"));
 
@@ -36,8 +32,7 @@ public class TestSortedArrayStorage {
         SORTED_STORAGE.delete("B");
         printAll();
 
-        Resume updated = new Resume();
-        updated.setUuid("A");
+        Resume updated = new Resume("A");
         SORTED_STORAGE.update(updated);
         printAll();
 
