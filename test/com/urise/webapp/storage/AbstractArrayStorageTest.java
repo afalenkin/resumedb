@@ -7,10 +7,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertSame;
 
 public abstract class AbstractArrayStorageTest {
     private Storage storage;
+    private static final int STORAGE_LIMIT = 10_000;
     private final String uuid1 = "UUID_1";
     private final String uuid2 = "UUID_2";
     private final String uuid3 = "UUID_3";
@@ -42,17 +43,15 @@ public abstract class AbstractArrayStorageTest {
     public void getAll() {
         Resume[] resumes = storage.getAll();
         Assert.assertEquals(storage.size(), resumes.length);
-        Assert.assertEquals(uuid1, resumes[0].getUuid());
-        Assert.assertEquals(uuid2, resumes[1].getUuid());
-        Assert.assertEquals(uuid3, resumes[2].getUuid());
+        Assert.assertEquals(storage.get(uuid1), resumes[0]);
+        Assert.assertEquals(storage.get(uuid2), resumes[1]);
+        Assert.assertEquals(storage.get(uuid3), resumes[2]);
     }
 
-    @Test
+    @Test(expected = NotExistStorageException.class)
     public void delete() {
         storage.delete(uuid2);
-        Assert.assertEquals(2, storage.size());
-        Assert.assertEquals(uuid1, storage.get(uuid1).getUuid());
-        Assert.assertEquals(uuid3, storage.get(uuid3).getUuid());
+        storage.get(uuid2);
     }
 
     @Test(expected = NotExistStorageException.class)
@@ -75,10 +74,6 @@ public abstract class AbstractArrayStorageTest {
     @Test
     public void update() {
         Resume resume = new Resume(uuid1);
-
-        //check that the memory address is different
-        assertNotSame(resume, storage.get(uuid1));
-
         storage.update(resume);
 
         //check that the address in memory matches
@@ -96,8 +91,8 @@ public abstract class AbstractArrayStorageTest {
     @Test(expected = StorageException.class)
     public void saveOverFlow() {
         try {
-            for (int i = 3; i < 10_000; i++) {
-                storage.save(new Resume("U" +i));
+            for (int i = storage.size(); i < STORAGE_LIMIT; i++) {
+                storage.save(new Resume("U" + i));
             }
         } catch (StorageException e) {
             Assert.fail("Premature overflow");
