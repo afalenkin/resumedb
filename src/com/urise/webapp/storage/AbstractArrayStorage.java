@@ -62,7 +62,7 @@ public abstract class AbstractArrayStorage implements Storage {
             throw new StorageException("Warning! Storage is crowded", resume.getUuid());
         }
         int position = getIndex(resume.getUuid());
-        if (position > 0) {
+        if (position >= 0) {
             throw new ExistStorageException(resume.getUuid());
         } else {
             insertElement(position, resume);
