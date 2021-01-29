@@ -2,7 +2,6 @@ package com.urise.webapp.storage;
 
 import com.urise.webapp.exception.ExistStorageException;
 import com.urise.webapp.exception.NotExistStorageException;
-import com.urise.webapp.exception.StorageException;
 import com.urise.webapp.model.Resume;
 import org.junit.Assert;
 import org.junit.Before;
@@ -10,8 +9,8 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertSame;
 
-public abstract class AbstractArrayStorageTest {
-    private Storage storage;
+public class ListStorageTest {
+    private ListStorage storage = new ListStorage();
     private static final String uuid1 = "UUID_1";
     private static final Resume RESUME_1 = new Resume(uuid1);
 
@@ -23,10 +22,6 @@ public abstract class AbstractArrayStorageTest {
 
     private static final String uuid4 = "UUID_4";
     private static final Resume RESUME_4 = new Resume(uuid4);
-
-    protected AbstractArrayStorageTest(Storage storage) {
-        this.storage = storage;
-    }
 
     @Before
     public void setUp() throws Exception {
@@ -108,18 +103,6 @@ public abstract class AbstractArrayStorageTest {
         storage.save(RESUME_1);
     }
 
-    @Test(expected = StorageException.class)
-    public void saveOverFlow() {
-        try {
-            for (int i = storage.size(); i < AbstractArrayStorage.STORAGE_LIMIT; i++) {
-                storage.save(new Resume());
-            }
-        } catch (StorageException e) {
-            Assert.fail("Premature overflow");
-        }
-        storage.save(new Resume());
-    }
-
     private void assertSize(int expected) {
         Assert.assertEquals(expected, storage.size());
     }
@@ -127,4 +110,5 @@ public abstract class AbstractArrayStorageTest {
     private void assertGet(Resume resume) {
         Assert.assertEquals(resume, storage.get(resume.getUuid()));
     }
+
 }
