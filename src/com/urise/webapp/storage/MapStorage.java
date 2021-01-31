@@ -8,7 +8,7 @@ public class MapStorage extends AbstractStorage {
     private HashMap<String, Resume> storage;
 
     public MapStorage() {
-        this.storage = new HashMap<String, Resume>();
+        this.storage = new HashMap<>();
     }
 
     @Override
@@ -29,28 +29,34 @@ public class MapStorage extends AbstractStorage {
     //implement AbstractStorage methods
 
     @Override
-    public void setResume(int index, Resume resume) {
+    public void setResume(Object index, Resume resume) {
         storage.put(resume.getUuid(), resume);
     }
 
     @Override
-    public void addResume(int index, Resume resume) {
+    public void addResume(Object index, Resume resume) {
         storage.put(resume.getUuid(), resume);
     }
 
     @Override
-    protected Resume getResume(int index, String uuid) {
-        return storage.get(uuid);
+    protected Resume getResume(Object uuid) {
+        return storage.get((String) uuid);
     }
 
     @Override
-    public void deleteResume(int index, String uuid) {
-        storage.remove(uuid);
+    public void deleteResume(Object uuid) {
+        storage.remove((String) uuid);
     }
 
     @Override
-    protected int getIndex(String uuid) {
-        if (storage.containsKey(uuid)) return 1;
-        return -1;
+    protected Object getSearchKey(String uuid) {
+        return uuid;
+
     }
+
+    @Override
+    protected boolean isExist(Object searchKey) {
+        return storage.containsKey((String) searchKey);
+    }
+
 }

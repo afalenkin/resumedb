@@ -33,34 +33,39 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
 
     //implement AbstractStorage methods
 
-    public void setResume(int index, Resume resume) {
-        storage[index] = resume;
+    public void setResume(Object index, Resume resume) {
+        storage[(int) index] = resume;
     }
 
     @Override
-    protected void addResume(int index, Resume resume) {
+    protected void addResume(Object index, Resume resume) {
         if (size == STORAGE_LIMIT) {
             throw new StorageException("Warning! Storage is crowded", resume.getUuid());
         }
-        insertElement(index, resume);
+        insertElement((int) index, resume);
         size++;
     }
 
     @Override
-    public Resume getResume(int index, String uuid) {
-        return storage[index];
+    public Resume getResume(Object index) {
+        return storage[(int) index];
     }
 
     @Override
-    protected void deleteResume(int index, String uuid) {
-        fillDeletedElement(index);
+    protected void deleteResume(Object index) {
+        fillDeletedElement((int) index);
         storage[size--] = null;
+    }
+
+    @Override
+    protected boolean isExist(Object index) {
+        return (int) index >= 0;
     }
 
     protected abstract void insertElement(int position, Resume resume);
 
     protected abstract void fillDeletedElement(int index);
 
-    protected abstract int getIndex(String uuid);
+    protected abstract Object getSearchKey(String uuid);
 
 }
