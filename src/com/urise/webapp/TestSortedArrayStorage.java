@@ -11,12 +11,12 @@ public class TestSortedArrayStorage {
         System.out.println("Testing SortedArrayStorage");
         Storage sortedStorage = new SortedArrayStorage();
 
-        Resume res1 = new Resume("D");
-        Resume res2 = new Resume("B");
-        Resume res3 = new Resume("A");
-        Resume res4 = new Resume("C");
+        Resume res1 = new Resume("D", "Arnold");
+        Resume res2 = new Resume("B", "Conor");
+        Resume res3 = new Resume("A", "Conor");
+        Resume res4 = new Resume("C", "Zack");
 
-        System.out.println("Get Dummy = " + SORTED_STORAGE.get("Dummy"));
+      //  System.out.println("Get Dummy = " + SORTED_STORAGE.get("Dummy"));
 
         SORTED_STORAGE.save(res1);
         printAll();
@@ -36,13 +36,17 @@ public class TestSortedArrayStorage {
         SORTED_STORAGE.update(updated);
         printAll();
 
+        System.out.println(SORTED_STORAGE.getAllSorted());
+
         SORTED_STORAGE.clear();
         printAll();
+
+
     }
 
     static void printAll() {
         System.out.println("\nGet All");
-        for (Resume r : SORTED_STORAGE.getAll()) {
+        for (Resume r : SORTED_STORAGE.getAllSorted()) {
             System.out.println(r);
         }
     }

@@ -5,7 +5,7 @@ import com.urise.webapp.model.Resume;
 import java.util.HashMap;
 
 public class MapStorage extends AbstractStorage {
-    private HashMap<String, Resume> storage;
+    protected HashMap<String, Resume> storage;
 
     public MapStorage() {
         this.storage = new HashMap<>();
@@ -22,20 +22,20 @@ public class MapStorage extends AbstractStorage {
     }
 
     @Override
-    public Resume[] getAll() {
+    protected Resume[] getAll() {
         return storage.values().toArray(Resume[]::new);
     }
 
     //implement AbstractStorage methods
 
     @Override
-    public void setResume(Object index, Resume resume) {
-        storage.put(resume.getUuid(), resume);
+    public void setResume(Object searchKey, Resume resume) {
+        storage.put((String) searchKey, resume);
     }
 
     @Override
-    public void addResume(Object index, Resume resume) {
-        storage.put(resume.getUuid(), resume);
+    public void addResume(Object searchKey, Resume resume) {
+        storage.put((String) searchKey, resume);
     }
 
     @Override

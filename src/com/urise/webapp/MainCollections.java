@@ -31,18 +31,23 @@ public class MainCollections {
                 iterator.remove();
             }
         }
-        System.out.println(collection.toString() +"\n");
+        System.out.println(collection.toString() + "\n");
 
         Map<String, Resume> resumes = new HashMap<>();
         resumes.put(uuid1, RESUME_1);
         resumes.put(uuid2, RESUME_2);
         resumes.put(uuid3, RESUME_3);
 
-        for (Map.Entry<String, Resume> resume: resumes.entrySet()
-             ) {
+        for (Map.Entry<String, Resume> resume : resumes.entrySet()
+        ) {
             System.out.println(resume.getValue());
         }
+
+        List<Resume> resums = Arrays.asList(RESUME_1, RESUME_2, RESUME_3);
+        resumes.remove(1);
+        System.out.println(resums);
     }
-
-
 }
+
+
+

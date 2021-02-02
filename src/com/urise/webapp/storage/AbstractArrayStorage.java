@@ -25,7 +25,7 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     }
 
     @Override
-    public Resume[] getAll() {
+    protected Resume[] getAll() {
         Resume[] result = new Resume[size];
         System.arraycopy(storage, 0, result, 0, size);
         return result;
@@ -66,6 +66,5 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
 
     protected abstract void fillDeletedElement(int index);
 
-    protected abstract Object getSearchKey(String uuid);
 
 }
