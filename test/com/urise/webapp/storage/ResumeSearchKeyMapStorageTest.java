@@ -1,8 +1,9 @@
 package com.urise.webapp.storage;
 
-public class ResumeSearchKeyMapStorageTest extends MapStorageTest {
+public class ResumeSearchKeyMapStorageTest extends AbstractStorageTest {
     public ResumeSearchKeyMapStorageTest() {
-        this.storage = new ResumeSearchKeyMapStorage();
+        super(new ResumeSearchKeyMapStorage());
+
     }
 
 }
