@@ -30,12 +30,11 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     protected List<Resume> getAll() {
         Resume[] allResume = new Resume[size];
         System.arraycopy(storage, 0, allResume, 0, size);
-        ArrayList<Resume> result = new ArrayList<>(Arrays.asList(allResume));
-        return result;
+        return new ArrayList<>(Arrays.asList(allResume));
     }
 
     //implement AbstractStorage methods
-
+    @Override
     public void setResume(Object index, Resume resume) {
         storage[(int) index] = resume;
     }
@@ -68,6 +67,5 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
     protected abstract void insertElement(int position, Resume resume);
 
     protected abstract void fillDeletedElement(int index);
-
 
 }

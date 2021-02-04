@@ -12,7 +12,6 @@ public class ArrayStorage extends AbstractArrayStorage {
         storage[index] = storage[size - 1];
     }
 
-
     @Override
     protected void insertElement(int position, Resume resume) {
         storage[size] = resume;

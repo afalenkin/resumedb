@@ -22,4 +22,5 @@ public abstract class AbstractArrayStorageTest extends AbstractStorageTest {
         }
         storage.save(new Resume("Test"));
     }
+
 }

@@ -12,17 +12,13 @@ public class Resume {
     private String fullName;
 
     public Resume(String fullName) {
-        this.fullName = fullName;
-        this.uuid = UUID.randomUUID().toString();
-
+        this(UUID.randomUUID().toString(), fullName);
     }
 
     public Resume(String uuid, String fullName) {
         this.uuid = uuid;
         this.fullName = fullName;
     }
-
-
 
     public String getFullName() {
         return fullName;
