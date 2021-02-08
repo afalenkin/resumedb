@@ -5,8 +5,8 @@ import com.urise.webapp.model.Resume;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ListStorage extends AbstractStorage {
-    private List<Resume> storage;
+public class ListStorage extends AbstractStorage<Integer> {
+    private final List<Resume> storage;
 
     public ListStorage() {
         this.storage = new ArrayList<>();
@@ -25,33 +25,33 @@ public class ListStorage extends AbstractStorage {
 
     @Override
     protected List<Resume> getAll() {
-        return storage;
+        return new ArrayList<>(storage);
     }
 
     //implement AbstractStorage methods
 
     @Override
-    public void setResume(Object index, Resume resume) {
-        storage.set((int) index, resume);
+    public void setResume(Integer index, Resume resume) {
+        storage.set(index, resume);
     }
 
     @Override
-    public void addResume(Object index, Resume resume) {
+    public void addResume(Integer index, Resume resume) {
         storage.add(resume);
     }
 
     @Override
-    protected Resume getResume(Object index) {
-        return storage.get((int) index);
+    protected Resume getResume(Integer index) {
+        return storage.get(index);
     }
 
     @Override
-    public void deleteResume(Object index) {
-        storage.remove((int) index);
+    public void deleteResume(Integer index) {
+        storage.remove(index.intValue());
     }
 
     @Override
-    protected Object getSearchKey(String uuid) {
+    protected Integer getSearchKey(String uuid) {
         for (int i = 0; i < storage.size(); i++) {
             if (storage.get(i).getUuid().equals(uuid)) {
                 return i;
@@ -61,7 +61,7 @@ public class ListStorage extends AbstractStorage {
     }
 
     @Override
-    protected boolean isExist(Object index) {
-        return (int) index >= 0;
+    protected boolean isExist(Integer index) {
+        return index >= 0;
     }
 }

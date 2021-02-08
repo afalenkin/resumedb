@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class AbstractArrayStorage extends AbstractStorage {
+public abstract class AbstractArrayStorage extends AbstractStorage<Integer> {
     protected static final int STORAGE_LIMIT = 10_000;
     protected Resume[] storage = new Resume[STORAGE_LIMIT];
 
@@ -35,37 +35,36 @@ public abstract class AbstractArrayStorage extends AbstractStorage {
 
     //implement AbstractStorage methods
     @Override
-    public void setResume(Object index, Resume resume) {
-        storage[(int) index] = resume;
+    public void setResume(Integer index, Resume resume) {
+        storage[index] = resume;
     }
 
     @Override
-    protected void addResume(Object index, Resume resume) {
+    protected void addResume(Integer index, Resume resume) {
         if (size == STORAGE_LIMIT) {
             throw new StorageException("Warning! Storage is crowded", resume.getUuid());
         }
-        insertElement((int) index, resume);
+        insertElement(index, resume);
         size++;
     }
 
     @Override
-    public Resume getResume(Object index) {
-        return storage[(int) index];
+    public Resume getResume(Integer index) {
+        return storage[index];
     }
 
     @Override
-    protected void deleteResume(Object index) {
-        fillDeletedElement((int) index);
+    protected void deleteResume(Integer index) {
+        fillDeletedElement(index);
         storage[size--] = null;
     }
 
     @Override
-    protected boolean isExist(Object index) {
-        return (int) index >= 0;
+    protected boolean isExist(Integer index) {
+        return index >= 0;
     }
 
     protected abstract void insertElement(int position, Resume resume);
 
     protected abstract void fillDeletedElement(int index);
-
 }

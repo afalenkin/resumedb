@@ -2,39 +2,38 @@ package com.urise.webapp.storage;
 
 import com.urise.webapp.model.Resume;
 
-public class MapStorage extends AbstractMapStorage {
+public class MapStorage extends AbstractMapStorage<String> {
 
     //implement AbstractStorage methods
 
     @Override
-    public void setResume(Object searchKey, Resume resume) {
-        storage.put((String) searchKey, resume);
+    public void setResume(String searchKey, Resume resume) {
+        storage.put( searchKey, resume);
     }
 
     @Override
-    public void addResume(Object searchKey, Resume resume) {
-        storage.put((String) searchKey, resume);
+    public void addResume(String searchKey, Resume resume) {
+        storage.put(searchKey, resume);
     }
 
     @Override
-    protected Resume getResume(Object uuid) {
-        return storage.get((String) uuid);
+    protected Resume getResume(String uuid) {
+        return storage.get(uuid);
     }
 
     @Override
-    public void deleteResume(Object uuid) {
-        storage.remove((String) uuid);
+    public void deleteResume(String uuid) {
+        storage.remove(uuid);
     }
 
     @Override
-    protected Object getSearchKey(String uuid) {
+    protected String getSearchKey(String uuid) {
         return uuid;
 
     }
 
     @Override
-    protected boolean isExist(Object searchKey) {
-        return storage.containsKey((String) searchKey);
+    protected boolean isExist(String searchKey) {
+        return storage.containsKey(searchKey);
     }
-
 }
