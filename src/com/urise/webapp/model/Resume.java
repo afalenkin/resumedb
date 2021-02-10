@@ -16,7 +16,7 @@ public class Resume implements Comparable<Resume> {
     private final String uuid;
     private final String fullName;
     public Map<ContactType, String> contacts = new EnumMap<>(ContactType.class);
-    public Map<SectionType, Content> sections = new EnumMap<>(SectionType.class);
+    public Map<SectionType, Content<?>> sections = new EnumMap<>(SectionType.class);
 
     public Resume(String fullName) {
         this(UUID.randomUUID().toString(), fullName);
@@ -29,24 +29,6 @@ public class Resume implements Comparable<Resume> {
         this.fullName = fullName;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder result = new StringBuilder();
-        result.append(fullName).append("\n");
-        for (Map.Entry<ContactType, String> entry : contacts.entrySet()
-        ) {
-            result.append(entry.getKey().toString()).append(" : ").append(entry.getValue()).append("\n");
-        }
-
-        for (Map.Entry<SectionType, Content> entry : sections.entrySet()
-        ) {
-            result.append(entry.getKey().toString()).append("\n");
-            result.append(entry.getValue().toString()).append("\n");
-
-        }
-        return result.toString();
-    }
-
     public String getFullName() {
         return fullName;
     }
@@ -56,17 +38,36 @@ public class Resume implements Comparable<Resume> {
     }
 
     @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        result.append(fullName).append("\n");
+        for (Map.Entry<ContactType, String> entry : contacts.entrySet()
+        ) {
+            result.append(entry.getKey().toString()).append(" : ").append(entry.getValue()).append("\n");
+        }
+
+        for (Map.Entry<SectionType, Content<?>> entry : sections.entrySet()) {
+            result.append(entry.getKey().toString()).append("\n");
+            result.append(entry.getValue().toString()).append("\n");
+
+        }
+        return result.toString();
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Resume)) return false;
         Resume resume = (Resume) o;
         return uuid.equals(resume.uuid) &&
-                fullName.equals(resume.fullName);
+                fullName.equals(resume.fullName) &&
+                contacts.equals(resume.contacts) &&
+                sections.equals(resume.sections);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(uuid, fullName);
+        return Objects.hash(uuid, fullName, contacts, sections);
     }
 
     @Override

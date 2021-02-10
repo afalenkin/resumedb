@@ -4,12 +4,10 @@ import com.urise.webapp.model.ContactType;
 import com.urise.webapp.model.Content.Content;
 import com.urise.webapp.model.Content.ListContent;
 import com.urise.webapp.model.Content.TextContent;
-import com.urise.webapp.model.Organization;
+import com.urise.webapp.model.Position;
 import com.urise.webapp.model.Resume;
 import com.urise.webapp.model.SectionType;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 public class ResumeTestData {
@@ -22,10 +20,10 @@ public class ResumeTestData {
         test.contacts.put(ContactType.LINKEDIN, "https://www.linkedin.com/in/gkislin");
         test.contacts.put(ContactType.STACKOVFLW, "https://stackoverflow.com/users/548473");
 
-        Content position = new TextContent("Ведущий стажировок и корпоративного обучения по Java Web и Enterprise технологиям");
-        Content qualities = new TextContent("Аналитический склад ума, сильная логика, креативность, инициативность. Пурист кода и архитектуры.");
+        Content<String> position = new TextContent("Ведущий стажировок и корпоративного обучения по Java Web и Enterprise технологиям");
+        Content<String> qualities = new TextContent("Аналитический склад ума, сильная логика, креативность, инициативность. Пурист кода и архитектуры.");
 
-        ListContent achievments = new ListContent(List.of(("С 2013 года: разработка проектов \"Разработка Web приложения\",\"Java Enterprise\", " +
+        Content<String> achievments = new ListContent<>(List.of(("С 2013 года: разработка проектов \"Разработка Web приложения\",\"Java Enterprise\", " +
                         "\"Многомодульный maven. Многопоточность. XML (JAXB/StAX). Веб сервисы (JAX-RS/SOAP). " +
                         "Удаленное взаимодействие (JMS/AKKA)\". Организация онлайн стажировок и ведение проектов." +
                         "Более 1000 выпускников."),
@@ -38,20 +36,24 @@ public class ResumeTestData {
                 ("Version control: Subversion, Git, Mercury, ClearCase, Perforce"),
                 "DB: PostgreSQL(наследование, pgplsql, PL/Python), Redis (Jedis), H2, Oracle,"));
 
-        Content<Organization> experience = new ListContent<>(List.of(
-                new Organization("Java Online Projects", "Автор проекта.", "Создание, организация и проведение Java онлайн проектов и стажировок.",
-                        new GregorianCalendar(2013, Calendar.OCTOBER, 1), new GregorianCalendar()),
-                new Organization("Wrike", "Старший разработчик (backend)", "Проектирование и разработка онлайн платформы управления проектами" +
-                        " Wrike (Java 8 API, Maven, Spring, MyBatis, Guava, Vaadin, PostgreSQL, Redis). Двухфакторная аутентификация, авторизация по OAuth1, OAuth2, JWT SSO.",
-                        new GregorianCalendar(2014, Calendar.OCTOBER, 1), new GregorianCalendar(2016, Calendar.JANUARY, 1))
-        ));
+        ListContent<Position> jops = new ListContent<>("JavaOps", List.of(new Position("Автор проекта.", "Создание, организация и проведение Java онлайн проектов и стажировок.", "10/2013", "10/2020")));
+        ListContent<Position> wrike = new ListContent<>("Wrike", List.of(new Position("Старший разработчик (backend)", "Проектирование и разработка онлайн платформы управления проектами Wrike" +
+                " (Java 8 API, Maven, Spring, MyBatis, Guava, Vaadin, PostgreSQL, Redis). Двухфакторная аутентификация, авторизация по OAuth1, OAuth2, JWT SSO.",
+                "10/2014", "01/2016")));
 
-        Content<Organization> education = new ListContent(List.of(
-                new Organization("Coursera", "Functional Programming Principles in Scala by Martin Odersky",
-                        new GregorianCalendar(2013, Calendar.FEBRUARY, 1), new GregorianCalendar(2013, Calendar.MAY, 1)),
-                new Organization("Luxoft", "Курс \"Объектно-ориентированный анализ ИС. Концептуальное моделирование на UML.\"",
-                        new GregorianCalendar(2011, Calendar.FEBRUARY, 1), new GregorianCalendar(2011, Calendar.APRIL, 1)
-                )));
+        Content<ListContent<Position>> experience = new ListContent<>(List.of(jops, wrike));
+
+        ListContent<Position> coursera = new ListContent<>("Coursera", List.of(new Position("Functional Programming Principles in Scala by Martin Odersky",
+                "02/2013", "05/2013")));
+        ListContent<Position> luxoft = new ListContent<>("Luxoft", List.of(new Position("Курс \"Объектно-ориентированный анализ ИС. Концептуальное моделирование на UML.\"",
+                "02/2011", "04/2011")));
+        ListContent<Position> spbu = new ListContent<>("Санкт-Петербургский национальный исследовательский университет информационных технологий, механики и оптики",
+                List.of(new Position("Аспирантура (программист С, С++)",
+                                "09/1993", "07/1996"),
+                        new Position("Инженер (программист Fortran, C)",
+                                "09/1987", "07/1993")));
+
+        Content<ListContent<Position>> education = new ListContent<>(List.of(coursera, luxoft, spbu));
 
         test.sections.put(SectionType.OBJECTIVE, position);
         test.sections.put(SectionType.PERSONAL, qualities);

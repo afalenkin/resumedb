@@ -6,22 +6,18 @@ public class ListContent<P> extends Content<P> {
     public ListContent(List<P> points) {
         this.points = points;
     }
-
-    @Override
-    protected void localSetPoints(List<P> points) {
-        this.points = points;
-    }
-
-    @Override
-    protected void localSetText(String text) {
-        throw new IllegalArgumentException("List content can not contains text");
+    public ListContent(String text, List<P> points) {
+        this(points);
+        this.text = text;
     }
 
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
-        for (P point : points
-        ) {
+        if (text != null && !text.isEmpty()) {
+            result.append(text).append("\n");
+        }
+        for (P point : points) {
             result.append(point.toString()).append("\n");
         }
         return result.toString();
