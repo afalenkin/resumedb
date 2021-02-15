@@ -5,7 +5,7 @@ import com.urise.webapp.model.Resume;
 
 import java.io.*;
 
-public class PathStrategy implements SerializeStrategy {
+public class InputOutputStreamsStrategy implements SerializeStrategy {
 
     @Override
     public void serializeResume(Resume resume, OutputStream bos) throws IOException {
