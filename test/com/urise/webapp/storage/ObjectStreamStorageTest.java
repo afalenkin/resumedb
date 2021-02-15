@@ -1,11 +1,9 @@
 package com.urise.webapp.storage;
 
-import java.io.File;
-
-import static org.junit.Assert.*;
+import com.urise.webapp.storage.storageSerializeStrategy.FileStrategy;
 
 public class ObjectStreamStorageTest extends AbstractStorageTest{
     public ObjectStreamStorageTest() {
-        super(new ObjectStreamStorage(new File(STORAGE_DIR)));
+        super(new FileStorage(STORAGE_DIR, new FileStrategy()));
     }
 }
