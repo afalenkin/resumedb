@@ -1,12 +1,15 @@
 package com.urise.webapp.model;
 
+import java.io.Serializable;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Organization {
+public class Organization implements Serializable {
+    private final static long serialVersionUID = 1L;
+
     private final Link homePage;
     private List<Position> positions = new ArrayList<>();
 
@@ -23,7 +26,7 @@ public class Organization {
         positions.get(positions.size() - 1).setDescription(description);
     }
 
-    public void addPosition(String startDate, String endDate, String title){
+    public void addPosition(String startDate, String endDate, String title) {
         positions.add(new Position(startDate, endDate, title));
     }
 
@@ -49,7 +52,9 @@ public class Organization {
                 '}';
     }
 
-    private class Position {
+    private static class Position implements Serializable {
+        private final static long serialVersionUID = 1L;
+
         private final YearMonth startDate;
         private final YearMonth endDate;
         private final String title;
@@ -61,8 +66,9 @@ public class Organization {
             this.endDate = YearMonth.parse(endDate, FORMATTER);
             this.title = title;
         }
+
         public Position(String startDate, String endDate, String title, String description) {
-           this(startDate, endDate, title);
+            this(startDate, endDate, title);
             this.description = description;
         }
 

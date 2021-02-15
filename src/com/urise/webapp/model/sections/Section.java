@@ -1,4 +1,7 @@
 package com.urise.webapp.model.sections;
 
-public abstract class Section {
+import java.io.Serializable;
+
+public abstract class Section implements Serializable {
+    private final static long serialVersionUID = 1L;
 }
