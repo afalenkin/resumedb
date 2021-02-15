@@ -8,12 +8,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractStorageTest {
-    protected static File STORAGE_DIR = new File("D:\\JavaOPS\\BaseJava\\basejava\\src\\com\\urise\\webapp\\resumes");
+    protected static String STORAGE_DIR = "D:\\JavaOPS\\BaseJava\\basejava\\src\\com\\urise\\webapp\\resumes";
     protected Storage storage;
     private static final String UUID_1 = "UUID_1";
     private static final Resume RESUME_1 = ResumeTestData.newResume(UUID_1, "Zack");
