@@ -12,8 +12,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertSame;
-
 public abstract class AbstractStorageTest {
     protected static File STORAGE_DIR = new File("D:\\JavaOPS\\BaseJava\\basejava\\src\\com\\urise\\webapp\\resumes");
     protected Storage storage;
@@ -88,8 +86,7 @@ public abstract class AbstractStorageTest {
         Resume resume = new Resume(UUID_1, "Jacky");
         storage.update(resume);
 
-        //check that the address in memory matches
-        assertSame(resume, storage.get(UUID_1));
+        Assert.assertEquals(resume, storage.get(UUID_1));
     }
 
     @Test(expected = NotExistStorageException.class)
