@@ -9,6 +9,7 @@ import com.urise.webapp.model.sections.OrganizationSection;
 import com.urise.webapp.model.sections.Section;
 import com.urise.webapp.model.sections.TextSection;
 
+import java.time.Month;
 import java.util.List;
 
 public class ResumeTestData {
@@ -50,17 +51,16 @@ public class ResumeTestData {
                 ("Version control: Subversion, Git, Mercury, ClearCase, Perforce"),
                 "DB: PostgreSQL(наследование, pgplsql, PL/Python), Redis (Jedis), H2, Oracle,"));
 
-        Organization jops = new Organization("Java Online Projects", "http://javaops.ru/", "10/2013",
-                "10/2020", "Автор проекта.", "Создание, организация и проведение Java онлайн проектов и стажировок.");
-        Organization wrike = new Organization("Wrike", "https://www.wrike.com/", "10/2014", "01/2016",
-                "Старший разработчик (backend)", "Проектирование и разработка онлайн платформы управления проектами Wrike...");
+        Organization jops = new Organization("Java Online Projects", "http://javaops.ru/", new Organization.Position( 2013, Month.OCTOBER, "Автор проекта.", "Создание, организация и проведение Java онлайн проектов и стажировок."));
+        Organization wrike = new Organization("Wrike", "https://www.wrike.com/", new Organization.Position(2014, Month.OCTOBER, 2016, Month.JANUARY,
+                "Старший разработчик (backend)", "Проектирование и разработка онлайн платформы управления проектами Wrike..."));
         Section experience = new OrganizationSection(List.of(jops, wrike));
 
-        Organization coursera = new Organization("Coursera", "https://www.coursera.org/course/progfun", "02/2013", "05/2013",
-                "Functional Programming Principles in Scala by Martin Odersky");
+        Organization coursera = new Organization("Coursera", "https://www.coursera.org/course/progfun",new Organization.Position(2013, Month.FEBRUARY, 2013, Month.MARCH,
+                "Functional Programming Principles in Scala by Martin Odersky", null));
         Organization spbu = new Organization("Санкт-Петербургский национальный исследовательский университет информационных технологий, механики и оптики",
-                "http://www.ifmo.ru/", "09/1993", "07/1996", "Аспирантура (программист С, С++)");
-        spbu.addPosition("09/1987", "07/1993", "Инженер (программист Fortran, C)");
+                "http://www.ifmo.ru/", new Organization.Position(1993, Month.SEPTEMBER, 1996, Month.JULY, "Аспирантура (программист С, С++)", null),
+        new Organization.Position(1987, Month.SEPTEMBER, 1993, Month.JULY, "Инженер (программист Fortran, C)", null));
         Section education = new OrganizationSection(List.of(coursera, spbu));
 
         result.addSection(SectionType.OBJECTIVE, objective);
