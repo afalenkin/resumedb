@@ -31,26 +31,33 @@ public class MainFile {
         System.out.println("--------------------------------\n");
 
         String researchDirPath = "D:\\JavaOPS\\BaseJava\\basejava";
-        researchDir(researchDirPath, true);
+        researchDir(researchDirPath, true, 0);
 
     }
 
     // boolean printDirs - print or don't print directories
-    public static void researchDir(String dirPath, boolean printDirs) {
+    public static void researchDir(String dirPath, boolean printDirs, int recursyLevel) {
+        for (int i = 0; i < recursyLevel; i++) {
+            System.out.print("\t");
+        }
         File dir = new File(dirPath);
         if (!dir.exists()) {
             return;
         }
         if (dir.isFile()) {
-            System.out.println(dir.getName());
+            System.out.println("file: " + dir.getName());
             return;
         }
         if (printDirs) {
             System.out.println("FOLDER:  " + dir.getName());
         }
-        for (File currentFile : dir.listFiles()
-        ) {
-            researchDir(currentFile.getAbsolutePath(), printDirs);
+        File[] content = dir.listFiles();
+        if (content == null) {
+            return;
+        }
+        recursyLevel++;
+        for (File currentFile : content) {
+            researchDir(currentFile.getPath(), printDirs, recursyLevel);
         }
 
     }
