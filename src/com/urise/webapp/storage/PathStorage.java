@@ -2,7 +2,7 @@ package com.urise.webapp.storage;
 
 import com.urise.webapp.exception.StorageException;
 import com.urise.webapp.model.Resume;
-import com.urise.webapp.storage.storageSerializeStrategy.SerializeStrategy;
+import com.urise.webapp.storage.SerializeStrategy.SerializeStrategy;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -10,10 +10,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PathStorage extends AbstractStorage<Path> {
     protected final Path directory;
@@ -28,8 +28,12 @@ public class PathStorage extends AbstractStorage<Path> {
         this.strategy = strategy;
     }
 
-    public void setStrategy(SerializeStrategy strategy) {
-        this.strategy = strategy;
+    private Stream<Path> getNotNullPathStream() {
+        try {
+            return Files.list(directory);
+        } catch (IOException e) {
+            throw new StorageException("Directory read error", null, e);
+        }
     }
 
     @Override
@@ -43,7 +47,7 @@ public class PathStorage extends AbstractStorage<Path> {
 
     @Override
     public int size() {
-        return getAll().size();
+        return (int) getNotNullPathStream().count();
     }
 
     @Override
@@ -54,7 +58,7 @@ public class PathStorage extends AbstractStorage<Path> {
     @Override
     protected void setResume(Path path, Resume resume) {
         try {
-            strategy.serializeResume(resume, new BufferedOutputStream(Files.newOutputStream(path)));
+            strategy.serialize(resume, new BufferedOutputStream(Files.newOutputStream(path)));
         } catch (IOException e) {
             throw new StorageException("Path write error", resume.getUuid(), e);
         }
@@ -78,7 +82,7 @@ public class PathStorage extends AbstractStorage<Path> {
     @Override
     protected Resume getResume(Path path) {
         try {
-            return strategy.unserializeResume(new BufferedInputStream(Files.newInputStream(path)));
+            return strategy.deserialize(new BufferedInputStream(Files.newInputStream(path)));
         } catch (IOException e) {
             throw new StorageException("Path read error", path.toString(), e);
         }
@@ -97,14 +101,6 @@ public class PathStorage extends AbstractStorage<Path> {
 
     @Override
     protected List<Resume> getAll() {
-        ArrayList<Resume> result = new ArrayList<>();
-        try {
-            for (Path path : Files.list(directory).collect(Collectors.toList())) {
-                result.add(getResume(path));
-            }
-        } catch (IOException e) {
-            throw new StorageException("Directory read error", null, e);
-        }
-        return result;
+        return getNotNullPathStream().map(this::getResume).collect(Collectors.toList());
     }
 }

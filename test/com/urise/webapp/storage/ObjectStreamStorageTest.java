@@ -1,6 +1,6 @@
 package com.urise.webapp.storage;
 
-import com.urise.webapp.storage.storageSerializeStrategy.InputOutputStreamsStrategy;
+import com.urise.webapp.storage.SerializeStrategy.InputOutputStreamsStrategy;
 
 public class ObjectStreamStorageTest extends AbstractStorageTest{
     public ObjectStreamStorageTest() {
