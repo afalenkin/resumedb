@@ -17,13 +17,13 @@ public class ResumeSearchKeyMapStorage extends AbstractMapStorage<Resume> {
     }
 
     @Override
-    protected Resume getResume(Resume searchKey) {
-        return searchKey;
+    public void deleteResume(Resume searchKey) {
+        storage.remove(searchKey.getUuid());
     }
 
     @Override
-    public void deleteResume(Resume searchKey) {
-        storage.remove(searchKey.getUuid());
+    protected Resume getResume(Resume searchKey) {
+        return searchKey;
     }
 
     @Override

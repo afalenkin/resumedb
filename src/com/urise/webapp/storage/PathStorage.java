@@ -2,7 +2,7 @@ package com.urise.webapp.storage;
 
 import com.urise.webapp.exception.StorageException;
 import com.urise.webapp.model.Resume;
-import com.urise.webapp.storage.SerializeStrategy.SerializeStrategy;
+import com.urise.webapp.storage.serializeStrategy.SerializeStrategy;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -28,21 +28,9 @@ public class PathStorage extends AbstractStorage<Path> {
         this.strategy = strategy;
     }
 
-    private Stream<Path> getNotNullPathStream() {
-        try {
-            return Files.list(directory);
-        } catch (IOException e) {
-            throw new StorageException("Directory read error", null, e);
-        }
-    }
-
     @Override
     public void clear() {
-        try {
-            Files.list(directory).forEach(this::deleteResume);
-        } catch (IOException e) {
-            throw new StorageException("Path delete error", null);
-        }
+        getNotNullPathStream().forEach(this::deleteResume);
     }
 
     @Override
@@ -102,5 +90,13 @@ public class PathStorage extends AbstractStorage<Path> {
     @Override
     protected List<Resume> getAll() {
         return getNotNullPathStream().map(this::getResume).collect(Collectors.toList());
+    }
+
+    private Stream<Path> getNotNullPathStream() {
+        try {
+            return Files.list(directory);
+        } catch (IOException e) {
+            throw new StorageException("Directory read error", null, e);
+        }
     }
 }

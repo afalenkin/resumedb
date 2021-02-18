@@ -46,6 +46,22 @@ public abstract class AbstractStorage<SK> implements Storage {
         return allResume;
     }
 
+    // child util methods
+
+    protected abstract void deleteResume(SK searchKey);
+
+    protected abstract SK getSearchKey(String uuid);
+
+    protected abstract void setResume(SK searchKey, Resume resume);
+
+    protected abstract void addResume(SK searchKey, Resume resume);
+
+    protected abstract Resume getResume(SK searchKey);
+
+    protected abstract boolean isExist(SK searchKey);
+
+    protected abstract List<Resume> getAll();
+
     // own util methods
     private SK getSearchKeyIfExist(String uuid) throws NotExistStorageException {
         SK searchKey = getSearchKey(uuid);
@@ -64,22 +80,4 @@ public abstract class AbstractStorage<SK> implements Storage {
         }
         return searchKey;
     }
-
-    // child util methods
-
-    protected abstract void deleteResume(SK searchKey);
-
-    protected abstract SK getSearchKey(String uuid);
-
-    protected abstract void setResume(SK searchKey, Resume resume);
-
-    protected abstract void addResume(SK searchKey, Resume resume);
-
-    protected abstract Resume getResume(SK searchKey);
-
-    protected abstract boolean isExist(SK searchKey);
-
-    protected abstract List<Resume> getAll();
-
-
 }
