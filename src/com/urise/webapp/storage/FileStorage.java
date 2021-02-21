@@ -13,18 +13,6 @@ public class FileStorage extends AbstractStorage<File> {
     protected File directory;
     private SerializeStrategy strategy;
 
-    @Override
-    public void clear() {
-        for (File file : getNotNulFilesArray()) {
-            deleteResume(file);
-        }
-    }
-
-    @Override
-    public int size() {
-        return getNotNulFilesArray().length;
-    }
-
     protected FileStorage(String dir, SerializeStrategy strategy) {
         this.directory = new File(dir);
         Objects.requireNonNull(directory, "directory must not be null");
@@ -35,6 +23,18 @@ public class FileStorage extends AbstractStorage<File> {
             throw new IllegalArgumentException(directory.getAbsolutePath() + " is not readable/writable");
         }
         this.strategy = strategy;
+    }
+
+    @Override
+    public void clear() {
+        for (File file : getNotNulFilesArray()) {
+            deleteResume(file);
+        }
+    }
+
+    @Override
+    public int size() {
+        return getNotNulFilesArray().length;
     }
 
     @Override
@@ -94,7 +94,7 @@ public class FileStorage extends AbstractStorage<File> {
     private File[] getNotNulFilesArray() {
         File[] files = directory.listFiles();
         if (files == null) {
-            throw new StorageException("Directory read error", null);
+            throw new StorageException("Directory read error");
         }
         return files;
     }

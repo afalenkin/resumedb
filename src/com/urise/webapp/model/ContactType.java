@@ -10,14 +10,13 @@ public enum ContactType {
     LINKEDIN("Профиль LinkedIn"),
     HOME_PAGE("Домашняя страница");
 
-    private final String type;
+    private final String title;
 
     ContactType(String type) {
-        this.type = type;
+        this.title = type;
     }
 
-    @Override
-    public String toString() {
-        return type;
+    public String getTitle() {
+        return title;
     }
 }

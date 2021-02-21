@@ -11,7 +11,9 @@ import org.junit.runners.Suite;
         MapStorageTest.class,
         ResumeSearchKeyMapStorageTest.class,
         ObjectStreamPathStorageTest.class,
-        ObjectStreamStorageTest.class
+        ObjectStreamStorageTest.class,
+        XmlStreamPathStorageTest.class,
+        JsonStreamPathStorageTest.class
 })
 public class AllStorageTest {
 }

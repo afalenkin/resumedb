@@ -2,6 +2,9 @@ package com.urise.webapp.model;
 
 import com.urise.webapp.model.sections.Section;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.EnumMap;
 import java.util.Map;
@@ -11,16 +14,21 @@ import java.util.UUID;
 /**
  * Initial resume class
  */
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Resume implements Comparable<Resume>, Serializable {
     private final static long serialVersionUID = 1L;
 
-    private final String uuid;
-    private final String fullName;
+    private String uuid;
+    private String fullName;
     private final Map<ContactType, String> contacts = new EnumMap<>(ContactType.class);
     private final Map<SectionType, Section> sections = new EnumMap<>(SectionType.class);
 
     public Resume(String fullName) {
         this(UUID.randomUUID().toString(), fullName);
+    }
+
+    public Resume() {
     }
 
     public Resume(String uuid, String fullName) {
@@ -46,6 +54,14 @@ public class Resume implements Comparable<Resume>, Serializable {
         return sections.get(type);
     }
 
+    public Map<ContactType, String> getContacts() {
+        return contacts;
+    }
+
+    public Map<SectionType, Section> getSections() {
+        return sections;
+    }
+
     public void addContact(ContactType type, String content) {
         contacts.put(type, content);
     }
@@ -60,11 +76,11 @@ public class Resume implements Comparable<Resume>, Serializable {
         result.append(fullName).append("\n");
         for (Map.Entry<ContactType, String> entry : contacts.entrySet()
         ) {
-            result.append(entry.getKey().toString()).append(" : ").append(entry.getValue()).append("\n");
+            result.append(entry.getKey().getTitle()).append(" : ").append(entry.getValue()).append("\n");
         }
 
         for (Map.Entry<SectionType, Section> entry : sections.entrySet()) {
-            result.append(entry.getKey().toString()).append("\n");
+            result.append(entry.getKey().getTitle()).append("\n");
             result.append(entry.getValue().toString()).append("\n");
 
         }

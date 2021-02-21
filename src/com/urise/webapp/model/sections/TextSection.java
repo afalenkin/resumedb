@@ -5,16 +5,19 @@ import java.util.Objects;
 public class TextSection extends Section {
     private final static long serialVersionUID = 1L;
 
-    private final String content;
+    private String content;
+
+    public TextSection() {
+    }
 
     public TextSection(String content) {
         Objects.requireNonNull(content, "content must not be null");
         this.content = content;
     }
 
-    public String getContent() {
+   /* public String getContent() {
         return content;
-    }
+    }*/
 
     @Override
     public String toString() {
