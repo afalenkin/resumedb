@@ -11,59 +11,36 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class DataStreamStrategy implements SerializeStrategy {
 
     @Override
     public void serialize(Resume resume, OutputStream bos) throws IOException {
         try (DataOutputStream dos = new DataOutputStream(bos)) {
-            dos.writeUTF(resume.getUuid());
-            dos.writeUTF(resume.getFullName());
+            writeToFile(dos, resume.getUuid(), resume.getFullName());
 
-            Map<ContactType, String> contacts = resume.getContacts();
-            dos.writeInt(contacts.size());
-            for (Map.Entry<ContactType, String> pair : contacts.entrySet()) {
-                dos.writeUTF(pair.getKey().toString());
-                dos.writeUTF(pair.getValue());
+            for (Map.Entry<ContactType, String> pair : getSetWriteSize(dos, resume.getContacts())) {
+                writeToFile(dos, pair.getKey().toString(), pair.getValue());
             }
 
-            Map<SectionType, Section> sections = resume.getSections();
-            dos.writeInt(sections.size());
-            for (Map.Entry<SectionType, Section> section : sections.entrySet()
+            for (Map.Entry<SectionType, Section> section : getSetWriteSize(dos, resume.getSections())
             ) {
                 String sectionSpecies = section.getValue().getClass().getSimpleName();
-                dos.writeUTF(sectionSpecies);
-                dos.writeUTF(section.getKey().toString());
+                writeToFile(dos, sectionSpecies, section.getKey().toString());
 
                 switch (sectionSpecies) {
-                    case "TextSection": {
-                        dos.writeUTF(((TextSection) section.getValue()).toString());
-                        break;
-                    }
-                    case "ListSection": {
+                    case "TextSection" -> writeToFile(dos, section.getValue().toString());
+                    case "ListSection" -> {
                         List<String> items = ((ListSection) section.getValue()).getItems();
-                        dos.writeInt(items.size());
-                        for (String item : items) {
-                            dos.writeUTF(item);
-                        }
-                        break;
+                        writeToFile(dos, items.size(), items.toArray(String[]::new));
                     }
-                    case "OrganizationSection": {
-                        List<Organization> organizations = ((OrganizationSection) section.getValue()).getOrganizations();
-                        dos.writeInt(organizations.size());
-                        for (Organization organization : organizations
-                        ) {
-                            dos.writeUTF(organization.getHomePage().getName());
-                            dos.writeUTF(organization.getHomePage().getUrl());
-
-                            List<Organization.Position> positions = organization.getPositions();
-                            dos.writeInt(positions.size());
-
-                            for (Organization.Position position : positions) {
-                                dos.writeUTF(position.getDescription() == null? "none" : position.getDescription());
-                                dos.writeUTF(position.getStartDate().toString());
-                                dos.writeUTF(position.getEndDate().toString());
-                                dos.writeUTF(position.getTitle());
+                    case "OrganizationSection" -> {
+                        for (Organization organization : getListWriteSize(dos, ((OrganizationSection) section.getValue()).getOrganizations())) {
+                            writeToFile(dos, organization.getHomePage().getName(), organization.getHomePage().getUrl());
+                            for (Organization.Position position : getListWriteSize(dos, organization.getPositions())) {
+                                writeToFile(dos, position.getDescription() == null ? "none" : position.getDescription(),
+                                        position.getStartDate().toString(), position.getEndDate().toString(), position.getTitle());
                             }
                         }
                     }
@@ -88,42 +65,67 @@ public class DataStreamStrategy implements SerializeStrategy {
             for (int i = 0; i < sectionsSize; i++) {
                 String sectionSpecies = dis.readUTF();
                 SectionType sectionType = SectionType.valueOf(dis.readUTF());
+                result.addSection(sectionType, switchSection(dis, sectionSpecies));
+            }
+        }
+        return result;
+    }
 
-                switch (sectionSpecies) {
-                    case "TextSection": {
-                        result.addSection(sectionType, new TextSection(dis.readUTF()));
-                        break;
-                    }
-                    case "ListSection": {
-                        int itemsCount = dis.readInt();
-                        List<String> items = new ArrayList<>();
-                        for (int j = 0; j < itemsCount; j++) {
-                            items.add(dis.readUTF());
-                        }
-                        result.addSection(sectionType, new ListSection(items));
-                        break;
-                    }
-                    case "OrganizationSection": {
-                        int organizationsCount = dis.readInt();
-                        List<Organization> organizations = new ArrayList<>();
-                        for (int o = 0; o < organizationsCount; o++) {
-                            Link link = new Link(dis.readUTF(), dis.readUTF());
-                            List<Organization.Position> positions = new ArrayList<>();
-                            int positionsCount = dis.readInt();
-                            for (int p = 0; p < positionsCount; p++) {
-                                String description = dis.readUTF();
-                                positions.add(new Organization.Position(
-                                        LocalDate.parse(dis.readUTF()),
-                                        LocalDate.parse(dis.readUTF()),
-                                        dis.readUTF(),
-                                        description.equals("none") ? null : description
-                                ));
-                            }
-                            organizations.add(new Organization(link, positions));
-                        }
-                        result.addSection(sectionType, new OrganizationSection(organizations));
-                    }
+    // util write to file methods
+    private static void writeToFile(DataOutputStream dos, String... items) throws IOException {
+        for (String item : items) {
+            dos.writeUTF(item);
+        }
+    }
+
+    private static void writeToFile(DataOutputStream dos, int count, String... items) throws IOException {
+        dos.writeInt(count);
+        writeToFile(dos, items);
+    }
+
+    private static <K, V> Set<Map.Entry<K, V>> getSetWriteSize(DataOutputStream dos, Map<K, V> map) throws IOException {
+        dos.writeInt(map.size());
+        return map.entrySet();
+    }
+
+    private static <V> List<V> getListWriteSize(DataOutputStream dos, List<V> list) throws IOException {
+        dos.writeInt(list.size());
+        return list;
+    }
+
+    // util read from file methods
+    private Section switchSection(DataInputStream dis, String sectionSpecies) throws IOException {
+        Section result = null;
+        switch (sectionSpecies) {
+            case "TextSection" -> result = new TextSection(dis.readUTF());
+
+            case "ListSection" -> {
+                int itemsCount = dis.readInt();
+                List<String> items = new ArrayList<>();
+                for (int j = 0; j < itemsCount; j++) {
+                    items.add(dis.readUTF());
                 }
+                result = new ListSection(items);
+            }
+            case "OrganizationSection" -> {
+                int organizationsCount = dis.readInt();
+                List<Organization> organizations = new ArrayList<>();
+                for (int o = 0; o < organizationsCount; o++) {
+                    Link link = new Link(dis.readUTF(), dis.readUTF());
+                    List<Organization.Position> positions = new ArrayList<>();
+                    int positionsCount = dis.readInt();
+                    for (int p = 0; p < positionsCount; p++) {
+                        String description = dis.readUTF();
+                        positions.add(new Organization.Position(
+                                LocalDate.parse(dis.readUTF()),
+                                LocalDate.parse(dis.readUTF()),
+                                dis.readUTF(),
+                                description.equals("none") ? null : description
+                        ));
+                    }
+                    organizations.add(new Organization(link, positions));
+                }
+                result = new OrganizationSection(organizations);
             }
         }
         return result;
