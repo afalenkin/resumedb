@@ -11,7 +11,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class DataStreamStrategy implements SerializeStrategy {
 
@@ -20,35 +19,42 @@ public class DataStreamStrategy implements SerializeStrategy {
         try (DataOutputStream dos = new DataOutputStream(bos)) {
             writeToFile(dos, resume.getUuid(), resume.getFullName());
 
-            for (Map.Entry<ContactType, String> pair : getSetWriteSize(dos, resume.getContacts())) {
-                writeToFile(dos, pair.getKey().toString(), pair.getValue());
+            Map<ContactType, String> contacts = resume.getContacts();
+            writeToFile(dos, contacts.size());
+            for (Map.Entry<ContactType, String> pair : contacts.entrySet()) {
+                writeToFile(dos, pair.getKey().name(), pair.getValue());
             }
 
-            for (Map.Entry<SectionType, Section> section : getSetWriteSize(dos, resume.getSections())
-            ) {
-                String sectionSpecies = section.getValue().getClass().getSimpleName();
-                writeToFile(dos, sectionSpecies, section.getKey().toString());
+            Map<SectionType, Section> sections = resume.getSections();
+            writeToFile(dos, sections.size());
+            for (Map.Entry<SectionType, Section> section : sections.entrySet()) {
+                SectionType sectionType = section.getKey();
+                writeToFile(dos, sectionType.name());
 
-                switch (sectionSpecies) {
-                    case "TextSection" -> writeToFile(dos, section.getValue().toString());
-                    case "ListSection" -> {
+                switch (sectionType) {
+                    case PERSONAL, OBJECTIVE -> writeToFile(dos, section.getValue().toString());
+                    case ACHIEVEMENT, QUALIFICATIONS -> {
                         List<String> items = ((ListSection) section.getValue()).getItems();
                         writeToFile(dos, items.size(), items.toArray(String[]::new));
                     }
-                    case "OrganizationSection" -> {
-                        for (Organization organization : getListWriteSize(dos, ((OrganizationSection) section.getValue()).getOrganizations())) {
-                            writeToFile(dos, organization.getHomePage().getName(), organization.getHomePage().getUrl());
-                            for (Organization.Position position : getListWriteSize(dos, organization.getPositions())) {
-                                writeToFile(dos, position.getDescription() == null ? "none" : position.getDescription(),
+                    case EXPERIENCE, EDUCATION -> {
+                        List<Organization> organizations = ((OrganizationSection) section.getValue()).getOrganizations();
+                        writeToFile(dos, organizations.size());
+                        for (Organization organization : organizations) {
+                            writeToFile(dos, organization.getHomePage().getName(), canBeEmptyWhenWrite(organization.getHomePage().getUrl()));
+                            List<Organization.Position> positions = organization.getPositions();
+                            writeToFile(dos, positions.size());
+                            for (Organization.Position position : positions) {
+                                writeToFile(dos, canBeEmptyWhenWrite(position.getDescription()),
                                         position.getStartDate().toString(), position.getEndDate().toString(), position.getTitle());
                             }
                         }
                     }
                 }
+
             }
         }
     }
-
 
     @Override
     public Resume deserialize(InputStream bis) throws IOException {
@@ -63,9 +69,8 @@ public class DataStreamStrategy implements SerializeStrategy {
 
             int sectionsSize = dis.readInt();
             for (int i = 0; i < sectionsSize; i++) {
-                String sectionSpecies = dis.readUTF();
                 SectionType sectionType = SectionType.valueOf(dis.readUTF());
-                result.addSection(sectionType, switchSection(dis, sectionSpecies));
+                result.addSection(sectionType, switchSection(dis, sectionType));
             }
         }
         return result;
@@ -83,35 +88,32 @@ public class DataStreamStrategy implements SerializeStrategy {
         writeToFile(dos, items);
     }
 
-    private static <K, V> Set<Map.Entry<K, V>> getSetWriteSize(DataOutputStream dos, Map<K, V> map) throws IOException {
-        dos.writeInt(map.size());
-        return map.entrySet();
-    }
-
-    private static <V> List<V> getListWriteSize(DataOutputStream dos, List<V> list) throws IOException {
-        dos.writeInt(list.size());
-        return list;
+    private String canBeEmptyWhenWrite(String field) {
+        return field == null ? "none" : field;
     }
 
     // util read from file methods
-    private Section switchSection(DataInputStream dis, String sectionSpecies) throws IOException {
+    private Section switchSection(DataInputStream dis, SectionType sectionType) throws IOException {
         Section result = null;
-        switch (sectionSpecies) {
-            case "TextSection" -> result = new TextSection(dis.readUTF());
-
-            case "ListSection" -> {
+        switch (sectionType) {
+            case PERSONAL, OBJECTIVE: {
+                result = new TextSection(dis.readUTF());
+                break;
+            }
+            case ACHIEVEMENT, QUALIFICATIONS: {
                 int itemsCount = dis.readInt();
                 List<String> items = new ArrayList<>();
                 for (int j = 0; j < itemsCount; j++) {
                     items.add(dis.readUTF());
                 }
                 result = new ListSection(items);
+                break;
             }
-            case "OrganizationSection" -> {
+            case EXPERIENCE, EDUCATION: {
                 int organizationsCount = dis.readInt();
                 List<Organization> organizations = new ArrayList<>();
                 for (int o = 0; o < organizationsCount; o++) {
-                    Link link = new Link(dis.readUTF(), dis.readUTF());
+                    Link link = new Link(dis.readUTF(), canBeEmptyWhenRead(dis.readUTF()));
                     List<Organization.Position> positions = new ArrayList<>();
                     int positionsCount = dis.readInt();
                     for (int p = 0; p < positionsCount; p++) {
@@ -120,7 +122,7 @@ public class DataStreamStrategy implements SerializeStrategy {
                                 LocalDate.parse(dis.readUTF()),
                                 LocalDate.parse(dis.readUTF()),
                                 dis.readUTF(),
-                                description.equals("none") ? null : description
+                                canBeEmptyWhenRead(description)
                         ));
                     }
                     organizations.add(new Organization(link, positions));
@@ -130,4 +132,10 @@ public class DataStreamStrategy implements SerializeStrategy {
         }
         return result;
     }
+
+    private String canBeEmptyWhenRead(String field) {
+        return field.equals("none") ? null : field;
+    }
 }
+
+

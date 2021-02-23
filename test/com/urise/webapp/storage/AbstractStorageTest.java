@@ -25,6 +25,8 @@ public abstract class AbstractStorageTest {
 
     private static final Resume RESUME_4 = ResumeTestData.newResume("Jorge");
 
+    private static final Resume RESUME_5 = ResumeTestData.newResume("Gregory");
+
     protected AbstractStorageTest(Storage storage) {
         this.storage = storage;
     }

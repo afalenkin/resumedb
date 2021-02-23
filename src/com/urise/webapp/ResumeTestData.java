@@ -54,14 +54,19 @@ public class ResumeTestData {
         Organization jops = new Organization("Java Online Projects", "http://javaops.ru/", new Organization.Position(2013, Month.OCTOBER, "Автор проекта.", "Создание, организация и проведение Java онлайн проектов и стажировок."));
         Organization wrike = new Organization("Wrike", "https://www.wrike.com/", new Organization.Position(2014, Month.OCTOBER, 2016, Month.JANUARY,
                 "Старший разработчик (backend)", "Проектирование и разработка онлайн платформы управления проектами Wrike..."));
-        Section experience = new OrganizationSection(List.of(jops, wrike));
+        Organization withEmptyLink = new Organization("EmptyLink", null, new Organization.Position(2014, Month.OCTOBER, 2016, Month.JANUARY,
+                "Старший разработчик (backend)", "Проектирование и разработка онлайн платформы управления проектами Wrike..."));
+
+        Section experience = new OrganizationSection(List.of(jops, wrike, withEmptyLink));
 
         Organization coursera = new Organization("Coursera", "https://www.coursera.org/course/progfun", new Organization.Position(2013, Month.FEBRUARY, 2013, Month.MARCH,
+                "Functional Programming Principles in Scala by Martin Odersky", null));
+        Organization withoutUrl = new Organization("WithoutUrl", null, new Organization.Position(2013, Month.FEBRUARY, 2013, Month.MARCH,
                 "Functional Programming Principles in Scala by Martin Odersky", null));
         Organization spbu = new Organization("Санкт-Петербургский национальный исследовательский университет информационных технологий, механики и оптики",
                 "http://www.ifmo.ru/", new Organization.Position(1993, Month.SEPTEMBER, 1996, Month.JULY, "Аспирантура (программист С, С++)", null),
                 new Organization.Position(1987, Month.SEPTEMBER, 1993, Month.JULY, "Инженер (программист Fortran, C)", null));
-        Section education = new OrganizationSection(List.of(coursera, spbu));
+        Section education = new OrganizationSection(List.of(withoutUrl, coursera, spbu));
 
         result.addSection(SectionType.OBJECTIVE, objective);
         result.addSection(SectionType.PERSONAL, personal);
