@@ -8,24 +8,22 @@ import com.urise.webapp.model.sections.TextSection;
 
 import java.io.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DataStreamStrategy implements SerializeStrategy {
 
     @Override
     public void serialize(Resume resume, OutputStream bos) throws IOException {
         try (DataOutputStream dos = new DataOutputStream(bos)) {
-            writeToFile(dos, resume.getUuid(), resume.getFullName());
-
-            Map<ContactType, String> contacts = resume.getContacts();
-            writeToFile(dos, contacts.size());
-            contacts.forEach((key, value) -> writeToFile(dos, key.name(), value));
-
+            write(dos, resume.getUuid(), resume.getFullName());
+            writeWithException(dos, resume.getContacts().entrySet(),
+                    (Map.Entry<ContactType, String> pair) -> List.of(pair.getKey().name(), pair.getValue()));
             Map<SectionType, Section> sections = resume.getSections();
-            writeToFile(dos, sections.size());
-            sections.entrySet().forEach(pair -> switchSectionWhenWrite(dos, pair));
+            write(dos, sections.size());
+            for (Map.Entry<SectionType, Section> pair : sections.entrySet()
+            ) {
+                writeSection(dos, pair);
+            }
         }
     }
 
@@ -43,64 +41,70 @@ public class DataStreamStrategy implements SerializeStrategy {
             int sectionsSize = dis.readInt();
             for (int i = 0; i < sectionsSize; i++) {
                 SectionType sectionType = SectionType.valueOf(dis.readUTF());
-                result.addSection(sectionType, switchSectionWhenRead(dis, sectionType));
+                result.addSection(sectionType, readSection(dis, sectionType));
             }
         }
         return result;
     }
 
-    // util write to file methods
 
-    private void switchSectionWhenWrite(DataOutputStream dos, Map.Entry<SectionType, Section> section) {
+    // util write to file methods
+    private static <T> void writeWithException(DataOutputStream dos, Collection<T> collection, ElementTransformer<T> transformer) throws IOException {
+        Objects.requireNonNull(transformer);
+        dos.writeInt(collection.size());
+
+        for (T t : collection) {
+            write(dos, transformer.transform(t));
+        }
+    }
+
+    private void writeSection(DataOutputStream dos, Map.Entry<SectionType, Section> section) throws IOException {
         SectionType sectionType = section.getKey();
-        writeToFile(dos, sectionType.name());
+        write(dos, sectionType.name());
         switch (sectionType) {
-            case PERSONAL, OBJECTIVE -> writeToFile(dos, section.getValue().toString());
+            case PERSONAL, OBJECTIVE -> write(dos, section.getValue().toString());
             case ACHIEVEMENT, QUALIFICATIONS -> {
                 List<String> items = ((ListSection) section.getValue()).getItems();
-                writeToFile(dos, items.size(), items.toArray(String[]::new));
+                write(dos, items.size(), items.toArray(String[]::new));
             }
             case EXPERIENCE, EDUCATION -> {
                 List<Organization> organizations = ((OrganizationSection) section.getValue()).getOrganizations();
-                writeToFile(dos, organizations.size());
-                for (Organization organization : organizations) {
-                    writeToFile(dos, organization.getHomePage().getName(), canBeEmptyWhenWrite(organization.getHomePage().getUrl()));
-                    List<Organization.Position> positions = organization.getPositions();
-                    writeToFile(dos, positions.size());
-                    for (Organization.Position position : positions) {
-                        writeToFile(dos, canBeEmptyWhenWrite(position.getDescription()),
-                                position.getStartDate().toString(), position.getEndDate().toString(), position.getTitle());
-                    }
-                }
+                writeWithException(dos, organizations, (Organization o) -> {
+
+                    //write all positions in this organization to file
+                    writeWithException(dos, o.getPositions(),
+                            (Organization.Position position) -> List.of(getNoneIfNull(position.getDescription()),
+                            position.getStartDate().toString(), position.getEndDate().toString(), position.getTitle()));
+
+                    //link of the organization will be written after all positions
+                    return List.of(o.getHomePage().getName(), getNoneIfNull(o.getHomePage().getUrl()));
+                });
             }
         }
     }
 
-    private static void writeToFile(DataOutputStream dos, String... items) {
+    private static void write(DataOutputStream dos, String... items) throws IOException {
         for (String item : items) {
-            try {
-                dos.writeUTF(item);
-            } catch (IOException e) {
-                throw new RuntimeException("Rethrow IO exception when write to file", e);
-            }
+            dos.writeUTF(item);
         }
     }
 
-    private static void writeToFile(DataOutputStream dos, int count, String... items) {
-        try {
-            dos.writeInt(count);
-        } catch (IOException e) {
-            throw new RuntimeException("Rethrow IO exception when write to file", e);
-        }
-        writeToFile(dos, items);
+    private static void write(DataOutputStream dos, List<String> items) throws IOException {
+        write(dos, items.toArray(String[]::new));
     }
 
-    private String canBeEmptyWhenWrite(String field) {
+    private static void write(DataOutputStream dos, int count, String... items) throws IOException {
+        dos.writeInt(count);
+        write(dos, items);
+    }
+
+
+    private String getNoneIfNull(String field) {
         return field == null ? "none" : field;
     }
 
     // util read from file methods
-    private Section switchSectionWhenRead(DataInputStream dis, SectionType sectionType) throws IOException {
+    private Section readSection(DataInputStream dis, SectionType sectionType) throws IOException {
         Section result = null;
         switch (sectionType) {
             case PERSONAL, OBJECTIVE -> result = new TextSection(dis.readUTF());
@@ -117,7 +121,6 @@ public class DataStreamStrategy implements SerializeStrategy {
                 int organizationsCount = dis.readInt();
                 List<Organization> organizations = new ArrayList<>();
                 for (int o = 0; o < organizationsCount; o++) {
-                    Link link = new Link(dis.readUTF(), canBeEmptyWhenRead(dis.readUTF()));
                     List<Organization.Position> positions = new ArrayList<>();
                     int positionsCount = dis.readInt();
                     for (int p = 0; p < positionsCount; p++) {
@@ -126,8 +129,9 @@ public class DataStreamStrategy implements SerializeStrategy {
                                 LocalDate.parse(dis.readUTF()),
                                 LocalDate.parse(dis.readUTF()),
                                 dis.readUTF(),
-                                canBeEmptyWhenRead(description)));
+                                getNullIfNone(description)));
                     }
+                    Link link = new Link(dis.readUTF(), getNullIfNone(dis.readUTF()));
                     organizations.add(new Organization(link, positions));
                 }
                 result = new OrganizationSection(organizations);
@@ -136,9 +140,14 @@ public class DataStreamStrategy implements SerializeStrategy {
         return result;
     }
 
-    private String canBeEmptyWhenRead(String field) {
+    private String getNullIfNone(String field) {
         return field.equals("none") ? null : field;
     }
+}
+
+@FunctionalInterface
+interface ElementTransformer<T> {
+    List<String> transform(T t) throws IOException;
 }
 
 
