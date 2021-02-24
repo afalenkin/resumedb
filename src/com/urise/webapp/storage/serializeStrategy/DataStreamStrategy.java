@@ -17,13 +17,8 @@ public class DataStreamStrategy implements SerializeStrategy {
         try (DataOutputStream dos = new DataOutputStream(bos)) {
             write(dos, resume.getUuid(), resume.getFullName());
             writeWithException(dos, resume.getContacts().entrySet(),
-                    (Map.Entry<ContactType, String> pair) -> List.of(pair.getKey().name(), pair.getValue()));
-            Map<SectionType, Section> sections = resume.getSections();
-            write(dos, sections.size());
-            for (Map.Entry<SectionType, Section> pair : sections.entrySet()
-            ) {
-                writeSection(dos, pair);
-            }
+                    (Map.Entry<ContactType, String> pair) -> write(dos, pair.getKey().name(), pair.getValue()));
+            writeWithException(dos, resume.getSections().entrySet(), (Map.Entry<SectionType, Section> pair) -> writeSection(dos, pair));
         }
     }
 
@@ -47,14 +42,12 @@ public class DataStreamStrategy implements SerializeStrategy {
         return result;
     }
 
-
     // util write to file methods
     private static <T> void writeWithException(DataOutputStream dos, Collection<T> collection, ElementTransformer<T> transformer) throws IOException {
         Objects.requireNonNull(transformer);
         dos.writeInt(collection.size());
-
         for (T t : collection) {
-            write(dos, transformer.transform(t));
+            transformer.transform(t);
         }
     }
 
@@ -73,11 +66,11 @@ public class DataStreamStrategy implements SerializeStrategy {
 
                     //write all positions in this organization to file
                     writeWithException(dos, o.getPositions(),
-                            (Organization.Position position) -> List.of(getNoneIfNull(position.getDescription()),
-                            position.getStartDate().toString(), position.getEndDate().toString(), position.getTitle()));
+                            (Organization.Position position) -> write(dos, getNoneIfNull(position.getDescription()),
+                                    position.getStartDate().toString(), position.getEndDate().toString(), position.getTitle()));
 
                     //link of the organization will be written after all positions
-                    return List.of(o.getHomePage().getName(), getNoneIfNull(o.getHomePage().getUrl()));
+                    write(dos, o.getHomePage().getName(), getNoneIfNull(o.getHomePage().getUrl()));
                 });
             }
         }
@@ -89,15 +82,10 @@ public class DataStreamStrategy implements SerializeStrategy {
         }
     }
 
-    private static void write(DataOutputStream dos, List<String> items) throws IOException {
-        write(dos, items.toArray(String[]::new));
-    }
-
     private static void write(DataOutputStream dos, int count, String... items) throws IOException {
         dos.writeInt(count);
         write(dos, items);
     }
-
 
     private String getNoneIfNull(String field) {
         return field == null ? "none" : field;
@@ -108,7 +96,6 @@ public class DataStreamStrategy implements SerializeStrategy {
         Section result = null;
         switch (sectionType) {
             case PERSONAL, OBJECTIVE -> result = new TextSection(dis.readUTF());
-
             case ACHIEVEMENT, QUALIFICATIONS -> {
                 int itemsCount = dis.readInt();
                 List<String> items = new ArrayList<>();
@@ -147,7 +134,7 @@ public class DataStreamStrategy implements SerializeStrategy {
 
 @FunctionalInterface
 interface ElementTransformer<T> {
-    List<String> transform(T t) throws IOException;
+    void transform(T t) throws IOException;
 }
 
 
