@@ -111,7 +111,7 @@ public class DataStreamStrategy implements SerializeStrategy {
                                 dis.readUTF(),
                                 getNullIfNone(description)));
                     });
-                    Link link = new Link(dis.readUTF(), getNullIfNone(dis.readUTF()));
+                    Link link = new Link(orgDataStream.readUTF(), getNullIfNone(orgDataStream.readUTF()));
                     organizations.add(new Organization(link, positions));
                 });
                 result = new OrganizationSection(organizations);
