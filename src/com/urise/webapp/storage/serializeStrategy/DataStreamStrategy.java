@@ -28,16 +28,14 @@ public class DataStreamStrategy implements SerializeStrategy {
         try (DataInputStream dis = new DataInputStream(bis)) {
             result = new Resume(dis.readUTF(), dis.readUTF());
 
-            int contactsSize = dis.readInt();
-            for (int i = 0; i < contactsSize; i++) {
-                result.addContact(ContactType.valueOf(dis.readUTF()), dis.readUTF());
-            }
+            //read Contacts
+            readWithException(dis, dataStream -> result.addContact(ContactType.valueOf(dataStream.readUTF()), dataStream.readUTF()));
 
-            int sectionsSize = dis.readInt();
-            for (int i = 0; i < sectionsSize; i++) {
-                SectionType sectionType = SectionType.valueOf(dis.readUTF());
-                result.addSection(sectionType, readSection(dis, sectionType));
-            }
+            //read Sections
+            readWithException(dis, dataStream -> {
+                SectionType sectionType = SectionType.valueOf(dataStream.readUTF());
+                result.addSection(sectionType, readSection(dataStream, sectionType));
+            });
         }
         return result;
     }
@@ -97,34 +95,36 @@ public class DataStreamStrategy implements SerializeStrategy {
         switch (sectionType) {
             case PERSONAL, OBJECTIVE -> result = new TextSection(dis.readUTF());
             case ACHIEVEMENT, QUALIFICATIONS -> {
-                int itemsCount = dis.readInt();
                 List<String> items = new ArrayList<>();
-                for (int j = 0; j < itemsCount; j++) {
-                    items.add(dis.readUTF());
-                }
+                readWithException(dis, dataStream -> items.add(dataStream.readUTF()));
                 result = new ListSection(items);
             }
             case EXPERIENCE, EDUCATION -> {
-                int organizationsCount = dis.readInt();
                 List<Organization> organizations = new ArrayList<>();
-                for (int o = 0; o < organizationsCount; o++) {
+                readWithException(dis, orgDataStream -> {
                     List<Organization.Position> positions = new ArrayList<>();
-                    int positionsCount = dis.readInt();
-                    for (int p = 0; p < positionsCount; p++) {
+                    readWithException(dis, dataStream -> {
                         String description = dis.readUTF();
                         positions.add(new Organization.Position(
                                 LocalDate.parse(dis.readUTF()),
                                 LocalDate.parse(dis.readUTF()),
                                 dis.readUTF(),
                                 getNullIfNone(description)));
-                    }
+                    });
                     Link link = new Link(dis.readUTF(), getNullIfNone(dis.readUTF()));
                     organizations.add(new Organization(link, positions));
-                }
+                });
                 result = new OrganizationSection(organizations);
             }
         }
         return result;
+    }
+
+    private void readWithException(DataInputStream dis, ElementTransformer<DataInputStream> transformer) throws IOException {
+        int count = dis.readInt();
+        for (int i = 0; i < count; i++) {
+            transformer.transform(dis);
+        }
     }
 
     private String getNullIfNone(String field) {
