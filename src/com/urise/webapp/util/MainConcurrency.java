@@ -89,7 +89,6 @@ public class MainConcurrency {
         }
         System.out.println(Thread.currentThread().getName() + " came in first method, result is + " + secondMethod());
         return 10000;
-
     }
 
     public synchronized int secondMethod() {
