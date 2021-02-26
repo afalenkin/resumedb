@@ -1,4 +1,4 @@
-package com.urise.webapp.util;
+package com.urise.webapp;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,50 +58,9 @@ public class MainConcurrency {
             }
         });
         System.out.println(mainConcurrency.counter);
-
-        // deadlock
-        System.out.println("\nDeadlock block: ");
-        final MainConcurrency deadlock = new MainConcurrency();
-        Thread first = new Thread(() -> {
-            deadlock.firstMethod();
-            deadlock.done();
-        }, "First thread");
-
-        Thread second = new Thread(() -> {
-            deadlock.secondMethod();
-            deadlock.done();
-        }, "Second thread");
-
-        first.start();
-        second.start();
     }
 
     private synchronized void inc() {
         counter++;
-    }
-
-    // deadlock
-    public synchronized int firstMethod() {
-        try {
-            Thread.sleep(50);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        System.out.println(Thread.currentThread().getName() + " came in first method, result is + " + secondMethod());
-        return 10000;
-    }
-
-    public synchronized int secondMethod() {
-        try {
-            Thread.sleep(50);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        System.out.println(Thread.currentThread().getName() + " came in second method, result is " + firstMethod());
-        return 20000;
-    }
-
-    public void done(){
-        System.out.println("All threads have finished their work");
     }
 }
