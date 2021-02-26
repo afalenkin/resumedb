@@ -2,7 +2,23 @@ package com.urise.webapp;
 
 public class MainDeadlock {
 
+    public static void main(String[] args) {
+
+        System.out.println("\n DEADLOCK:");
+
+        new Thread(() -> {
+            lockMethod(10, 20);
+            done();
+        }, "First thread").start();
+
+        new Thread(() -> {
+            lockMethod(20, 10);
+            done();
+        }, "Second thread").start();
+    }
+
     // method with deadlock
+
     public static int lockMethod(Integer first, Integer second) {
         synchronized (first) {
             System.out.println(Thread.currentThread().getName() + " captured an object with a value " + first);
@@ -21,26 +37,5 @@ public class MainDeadlock {
 
     public static void done() {
         System.out.println("Thread have finished work");
-    }
-
-    public static void main(String[] args) {
-
-        System.out.println("\n DEADLOCK:");
-
-        Integer firstInt = 10;
-        Integer secondInt = 20;
-
-        Thread first = new Thread(() -> {
-            lockMethod(firstInt, secondInt);
-            done();
-        }, "First thread");
-
-        Thread second = new Thread(() -> {
-            lockMethod(secondInt, firstInt);
-            done();
-        }, "Second thread");
-
-        first.start();
-        second.start();
     }
 }
