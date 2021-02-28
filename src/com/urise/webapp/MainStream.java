@@ -2,7 +2,7 @@ package com.urise.webapp;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class MainStream {
@@ -23,8 +23,10 @@ public class MainStream {
     }
 
     public static List<Integer> oddOrEven(List<Integer> integers) {
-        Map<Integer, List<Integer>> result = integers.stream()
-                .collect(Collectors.groupingBy((Integer element) -> (element % 2)));
-        return (result.get(1).size() % 2 != 0 ? result.get(0) : result.get(1));
+        AtomicInteger sum = new AtomicInteger();
+        return integers.stream()
+                .peek(sum::addAndGet)
+                .collect(Collectors.partitioningBy(element -> (element % 2 == 0)))
+                .get(sum.intValue() % 2 != 0);
     }
 }
