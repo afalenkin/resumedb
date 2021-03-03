@@ -12,7 +12,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 public class XmlStreamsStrategy implements SerializeStrategy {
-    private XmlParser parser;
+    private final XmlParser parser;
 
     public XmlStreamsStrategy() {
         parser = new XmlParser(Resume.class, Organization.class, Organization.Position.class, Link.class, ListSection.class,

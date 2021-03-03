@@ -16,7 +16,7 @@ public class TestSortedArrayStorage {
         Resume res3 = new Resume("A", "Conor");
         Resume res4 = new Resume("C", "Zack");
 
-      //  System.out.println("Get Dummy = " + SORTED_STORAGE.get("Dummy"));
+        //  System.out.println("Get Dummy = " + SORTED_STORAGE.get("Dummy"));
 
         SORTED_STORAGE.save(res1);
         printAll();

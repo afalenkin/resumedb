@@ -1,6 +1,6 @@
 package com.urise.webapp.storage;
 
-import com.urise.webapp.ResumeTestData;
+import com.urise.webapp.Config;
 import com.urise.webapp.exception.ExistStorageException;
 import com.urise.webapp.exception.NotExistStorageException;
 import com.urise.webapp.model.Resume;
@@ -8,25 +8,26 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractStorageTest {
-    protected static String STORAGE_DIR = "D:\\JavaOPS\\BaseJava\\basejava\\src\\com\\urise\\webapp\\resumes";
+    protected static File STORAGE_DIR = Config.get().getStorageDir();
     protected Storage storage;
     private static final String UUID_1 = "UUID_1";
-    private static final Resume RESUME_1 = ResumeTestData.newResume(UUID_1, "Zack");
-
+    private static final Resume RESUME_1 =  //ResumeTestData.newResume(UUID_1, "Zack");
+            new Resume(UUID_1, "Zack");
     private static final String UUID_2 = "UUID_2";
-    private static final Resume RESUME_2 = ResumeTestData.newResume(UUID_2, "Arnold");
-
+    private static final Resume RESUME_2 = // ResumeTestData.newResume(UUID_2, "Arnold");
+            new Resume(UUID_2, "Arnold");
     private static final String UUID_3 = "UUID_3";
-    private static final Resume RESUME_3 = ResumeTestData.newResume(UUID_3, "Arnold");
-
-    private static final Resume RESUME_4 = ResumeTestData.newResume("Jorge");
-
-    private static final Resume RESUME_5 = ResumeTestData.newResume("Gregory");
-
+    private static final Resume RESUME_3 =  // ResumeTestData.newResume(UUID_3, "Arnold");
+            new Resume(UUID_3, "Arnold");
+    private static final Resume RESUME_4 =  //ResumeTestData.newResume("Jorge");
+            new Resume("Jorge");
+    private static final Resume RESUME_5 =  //ResumeTestData.newResume("Gregory");
+            new Resume("Gregory");
     protected AbstractStorageTest(Storage storage) {
         this.storage = storage;
     }

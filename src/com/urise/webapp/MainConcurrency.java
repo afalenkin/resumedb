@@ -12,7 +12,7 @@ public class MainConcurrency {
     private int counter;
     private final AtomicInteger atomicCounter = new AtomicInteger();
     private static final ThreadLocal<SimpleDateFormat> sdf = ThreadLocal.withInitial(() -> new SimpleDateFormat("dd.MM.yyyy HH:mm:ss"));
-   // private static final Object LOCK = new Object();
+    // private static final Object LOCK = new Object();
     public static final Lock lock = new ReentrantLock();
 
     public static void main(String[] args) throws InterruptedException, ExecutionException {
@@ -64,8 +64,7 @@ public class MainConcurrency {
         }
 
 
-
-       latch.await();
+        latch.await();
         service.shutdown();
         //System.out.println(mainConcurrency.counter);
         System.out.println(mainConcurrency.atomicCounter.get());

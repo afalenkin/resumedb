@@ -8,7 +8,7 @@ public class MapStorage extends AbstractMapStorage<String> {
 
     @Override
     public void setResume(String searchKey, Resume resume) {
-        storage.put( searchKey, resume);
+        storage.put(searchKey, resume);
     }
 
     @Override

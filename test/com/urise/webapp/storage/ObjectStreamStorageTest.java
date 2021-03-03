@@ -4,6 +4,6 @@ import com.urise.webapp.storage.serializeStrategy.InputOutputStreamsStrategy;
 
 public class ObjectStreamStorageTest extends AbstractStorageTest{
     public ObjectStreamStorageTest() {
-        super(new FileStorage(STORAGE_DIR, new InputOutputStreamsStrategy()));
+        super(new FileStorage(STORAGE_DIR.getAbsolutePath(), new InputOutputStreamsStrategy()));
     }
 }
