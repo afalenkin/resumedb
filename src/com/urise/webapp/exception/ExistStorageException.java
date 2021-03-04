@@ -5,5 +5,9 @@ public class ExistStorageException extends StorageException {
         super("Resume " + uuid + " currently exist!", uuid);
     }
 
+    public ExistStorageException(Exception e) {
+        super(e.getMessage());
+    }
+
 
 }

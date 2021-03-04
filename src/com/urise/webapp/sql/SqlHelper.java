@@ -1,5 +1,6 @@
 package com.urise.webapp.sql;
 
+import com.urise.webapp.exception.ExistStorageException;
 import com.urise.webapp.exception.StorageException;
 
 import java.sql.Connection;
@@ -7,34 +8,45 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class SqlHelper {
-    private PreparedStatement preparedStatement;
+    private final ConnectionFactory connectionFactory;
 
-    public <T> T executeQuery(ConnectionFactory connectionFactory, SqlExecutor<T> executor, String query, String... strings) {
+    public SqlHelper(ConnectionFactory connectionFactory) {
+        this.connectionFactory = connectionFactory;
+    }
+
+    public <T> T executeQuery(String query, SqlExecutor<T> executor) {
         try (Connection connection = connectionFactory.getConnection()) {
-            preparedStatement = connection.prepareStatement(query);
-            int n = strings.length;
-            if (n > 0) {
-                for (int i = 0; i < n; i++) {
-                    preparedStatement.setString(i + 1, strings[i]);
-                }
-            }
-            if (executor == null) {
-                preparedStatement.execute();
-                return null;
-            } else {
-                return executor.execute();
-            }
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            return executor.execute(preparedStatement);
         } catch (SQLException e) {
-            throw new StorageException(e.getMessage(), e);
+            throw switchException(e);
         }
     }
 
-    public <T> T executeQuery(ConnectionFactory connectionFactory, String query, String... strings) {
-        return executeQuery(connectionFactory, null, query, strings);
+    public void executeSimpleQuery(String query, String... strings) {
+        executeQuery(query, (preparedStatement) -> {
+            if (strings.length > 0) {
+                setStrings(preparedStatement, strings);
+            }
+            preparedStatement.execute();
+            return null;
+        });
     }
 
-    public PreparedStatement getPreparedStatement() {
-        return preparedStatement;
+    public void setStrings(PreparedStatement preparedStatement, String... strings) throws SQLException {
+        for (int i = 0; i < strings.length; i++) {
+            preparedStatement.setString(i + 1, strings[i]);
+        }
     }
+
+    private StorageException switchException(SQLException e) {
+        switch (e.getErrorCode()) {
+            case 0:
+                return new ExistStorageException(e);
+        }
+        return new StorageException(e.getMessage(), e);
+    }
+
+
 }
 

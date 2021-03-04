@@ -4,6 +4,6 @@ import com.urise.webapp.Config;
 
 public class SqlStorageTest extends AbstractStorageTest {
     public SqlStorageTest() {
-        super(new SqlStorage(Config.get().getProperties()));
+        super(Config.get().getDbStorage());
     }
 }
