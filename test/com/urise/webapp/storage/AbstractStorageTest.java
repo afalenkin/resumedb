@@ -10,24 +10,28 @@ import org.junit.Test;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 
 public abstract class AbstractStorageTest {
     protected static File STORAGE_DIR = Config.get().getStorageDir();
     protected Storage storage;
-    private static final String UUID_1 = "UUID_1";
+    private static final String UUID_1 = UUID.randomUUID().toString();
+    private static final String UUID_2 = UUID.randomUUID().toString();
+    private static final String UUID_3 = UUID.randomUUID().toString();
+
     private static final Resume RESUME_1 =  //ResumeTestData.newResume(UUID_1, "Zack");
             new Resume(UUID_1, "Zack");
-    private static final String UUID_2 = "UUID_2";
     private static final Resume RESUME_2 = // ResumeTestData.newResume(UUID_2, "Arnold");
             new Resume(UUID_2, "Arnold");
-    private static final String UUID_3 = "UUID_3";
     private static final Resume RESUME_3 =  // ResumeTestData.newResume(UUID_3, "Arnold");
             new Resume(UUID_3, "Arnold");
     private static final Resume RESUME_4 =  //ResumeTestData.newResume("Jorge");
             new Resume("Jorge");
     private static final Resume RESUME_5 =  //ResumeTestData.newResume("Gregory");
             new Resume("Gregory");
+
     protected AbstractStorageTest(Storage storage) {
         this.storage = storage;
     }
@@ -54,8 +58,10 @@ public abstract class AbstractStorageTest {
     @Test
     public void getAllSorted() {
         List<Resume> resumes = storage.getAllSorted();
+        List<Resume> expected = new ArrayList<>(List.of(RESUME_2, RESUME_3, RESUME_1));
+        expected.sort(Comparator.comparing(Resume::getFullName).thenComparing(Resume::getUuid));
         Assert.assertEquals(storage.size(), resumes.size());
-        Assert.assertEquals(new ArrayList<>(List.of(RESUME_2, RESUME_3, RESUME_1)), resumes);
+        Assert.assertEquals(expected, resumes);
     }
 
     @Test(expected = NotExistStorageException.class)

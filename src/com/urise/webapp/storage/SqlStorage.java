@@ -41,7 +41,7 @@ public class SqlStorage implements Storage {
     @Override
     public void save(Resume resume) {
         LOG.info("Save " + resume.getUuid());
-        helper.executeQuery("INSERT INTO resume (uuid, full_name) VALUES (?,?)", (prepSt)->{
+        helper.executeQuery("INSERT INTO resume (uuid, full_name) VALUES (?,?)", (prepSt) -> {
             prepSt.setString(1, resume.getUuid());
             prepSt.setString(2, resume.getFullName());
             prepSt.execute();
@@ -59,7 +59,7 @@ public class SqlStorage implements Storage {
                 throw new NotExistStorageException(uuid);
             }
             String fullName = resultSet.getString("full_name");
-            return new Resume(uuid.trim(), fullName.trim());
+            return new Resume(uuid, fullName);
         });
     }
 
@@ -82,7 +82,9 @@ public class SqlStorage implements Storage {
             List<Resume> allResume = new ArrayList<>();
             ResultSet resultSet = prepSt.executeQuery();
             while (resultSet.next()) {
-                allResume.add(get(resultSet.getString("uuid")));
+                String uuid = resultSet.getString("uuid");
+                String full_name = resultSet.getString("full_name");
+                allResume.add(new Resume(uuid, full_name));
             }
             return allResume;
         });
