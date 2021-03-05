@@ -23,26 +23,13 @@ public class SqlHelper {
         }
     }
 
-    public void executeSimpleQuery(String query, String... strings) {
-        executeQuery(query, (preparedStatement) -> {
-            if (strings.length > 0) {
-                setStrings(preparedStatement, strings);
-            }
-            preparedStatement.execute();
-            return null;
-        });
-    }
-
-    public void setStrings(PreparedStatement preparedStatement, String... strings) throws SQLException {
-        for (int i = 0; i < strings.length; i++) {
-            preparedStatement.setString(i + 1, strings[i]);
-        }
+    public void executeQuery(String query) {
+        executeQuery(query, PreparedStatement::execute);
     }
 
     private StorageException switchException(SQLException e) {
-        switch (e.getErrorCode()) {
-            case 0:
-                return new ExistStorageException(e);
+        if (e.getSQLState().equals("23505")) {
+            return new ExistStorageException(e);
         }
         return new StorageException(e.getMessage(), e);
     }

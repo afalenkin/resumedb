@@ -7,13 +7,11 @@ import com.urise.webapp.sql.SqlHelper;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
 
 public class SqlStorage implements Storage {
     private static final Logger LOG = Logger.getLogger(SqlStorage.class.getName());
-    private final static Comparator<Resume> RESUME_COMPARATOR = Comparator.comparing(Resume::getFullName).thenComparing(Resume::getUuid);
     private final SqlHelper helper;
 
     public SqlStorage(String dbUrl, String dbUser, String dbPassword) {
@@ -23,16 +21,18 @@ public class SqlStorage implements Storage {
     @Override
     public void clear() {
         LOG.info("Clear resume table");
-        helper.executeSimpleQuery("DELETE FROM resume");
+        helper.executeQuery("DELETE FROM resume");
     }
 
     @Override
-    public void update(Resume r) {
-        LOG.info("Update " + r.getUuid());
+    public void update(Resume resume) {
+        LOG.info("Update " + resume.getUuid());
         helper.executeQuery("UPDATE resume SET full_name=? WHERE uuid=?", (prepSt) -> {
-            helper.setStrings(prepSt, r.getFullName(), r.getUuid());
+            String uuid = resume.getUuid();
+            prepSt.setString(1, resume.getFullName());
+            prepSt.setString(2, uuid);
             if (prepSt.executeUpdate() != 1) {
-                throw new NotExistStorageException(r.getUuid());
+                throw new NotExistStorageException(uuid);
             }
             return null;
         });
@@ -41,14 +41,19 @@ public class SqlStorage implements Storage {
     @Override
     public void save(Resume resume) {
         LOG.info("Save " + resume.getUuid());
-        helper.executeSimpleQuery("INSERT INTO resume (uuid, full_name) VALUES (?,?)", resume.getUuid(), resume.getFullName());
+        helper.executeQuery("INSERT INTO resume (uuid, full_name) VALUES (?,?)", (prepSt)->{
+            prepSt.setString(1, resume.getUuid());
+            prepSt.setString(2, resume.getFullName());
+            prepSt.execute();
+            return null;
+        });
     }
 
     @Override
     public Resume get(String uuid) {
         LOG.info("Get from database " + uuid);
         return helper.executeQuery("SELECT * FROM resume r WHERE r.uuid =?", (prepSt) -> {
-            helper.setStrings(prepSt, uuid);
+            prepSt.setString(1, uuid);
             ResultSet resultSet = prepSt.executeQuery();
             if (!resultSet.next()) {
                 throw new NotExistStorageException(uuid);
@@ -62,7 +67,7 @@ public class SqlStorage implements Storage {
     public void delete(String uuid) {
         LOG.info("Delete from database " + uuid);
         helper.executeQuery("DELETE FROM resume r WHERE r.uuid =?", (prepSt) -> {
-            helper.setStrings(prepSt, uuid);
+            prepSt.setString(1, uuid);
             if (prepSt.executeUpdate() == 0) {
                 throw new NotExistStorageException(uuid);
             }
@@ -73,13 +78,12 @@ public class SqlStorage implements Storage {
     @Override
     public List<Resume> getAllSorted() {
         LOG.info("getAllSorted");
-        return helper.executeQuery("SELECT * FROM resume", (prepSt) -> {
+        return helper.executeQuery("SELECT * FROM resume ORDER BY full_name, uuid", (prepSt) -> {
             List<Resume> allResume = new ArrayList<>();
             ResultSet resultSet = prepSt.executeQuery();
             while (resultSet.next()) {
                 allResume.add(get(resultSet.getString("uuid")));
             }
-            allResume.sort(RESUME_COMPARATOR);
             return allResume;
         });
     }
