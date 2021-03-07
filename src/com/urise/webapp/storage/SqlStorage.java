@@ -154,7 +154,6 @@ public class SqlStorage implements Storage {
                 prepSt.setString(1, uuid);
                 prepSt.setString(2, pair.getKey().name());
                 prepSt.setString(3, pair.getValue());
-                System.out.println(uuid + "  " + pair.getKey().name() + " " + pair.getValue());
                 prepSt.addBatch();
             }
             prepSt.executeBatch();
