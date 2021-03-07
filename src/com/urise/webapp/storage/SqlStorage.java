@@ -5,7 +5,10 @@ import com.urise.webapp.model.ContactType;
 import com.urise.webapp.model.Resume;
 import com.urise.webapp.sql.SqlHelper;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -32,19 +35,21 @@ public class SqlStorage implements Storage {
         LOG.info("Update " + uuid);
 
         helper.transactionalExecute(connection -> {
-            try (PreparedStatement prepSt = connection.prepareStatement("UPDATE resume SET full_name=? WHERE uuid=?")) {
+            helper.executeStatement(connection, "UPDATE resume SET full_name=? WHERE uuid=?", prepSt -> {
                 prepSt.setString(1, resume.getFullName());
                 prepSt.setString(2, uuid);
                 if (prepSt.executeUpdate() != 1) {
                     throw new NotExistStorageException(uuid);
                 }
-            }
+                return null;
+            });
 
             //delete all contacts for current resume
-            try (PreparedStatement prepSt = connection.prepareStatement("DELETE FROM contact c WHERE c.resume_uuid =?")) {
+            helper.executeStatement(connection, "DELETE FROM contact c WHERE c.resume_uuid =?", prepSt -> {
                 prepSt.setString(1, uuid);
                 prepSt.execute();
-            }
+                return null;
+            });
 
             //insert new contacts for current resume
             putContacts(connection, resume);
@@ -56,11 +61,12 @@ public class SqlStorage implements Storage {
     public void save(Resume resume) {
         LOG.info("Save " + resume.getUuid());
         helper.transactionalExecute(connection -> {
-            try (PreparedStatement prepSt = connection.prepareStatement("INSERT INTO resume (uuid, full_name) VALUES (?,?)")) {
+            helper.executeStatement(connection, "INSERT INTO resume (uuid, full_name) VALUES (?,?)", prepSt -> {
                 prepSt.setString(1, resume.getUuid());
                 prepSt.setString(2, resume.getFullName());
                 prepSt.execute();
-            }
+                return null;
+            });
             putContacts(connection, resume);
             return null;
         });
@@ -143,7 +149,7 @@ public class SqlStorage implements Storage {
 
     private void putContacts(Connection connection, Resume resume) throws SQLException {
         String uuid = resume.getUuid();
-        try (PreparedStatement prepSt = connection.prepareStatement("INSERT INTO contact (resume_uuid, type, value) VALUES (?,?,?)")) {
+        helper.executeStatement(connection, "INSERT INTO contact (resume_uuid, type, value) VALUES (?,?,?)", prepSt -> {
             for (Map.Entry<ContactType, String> pair : resume.getContacts().entrySet()) {
                 prepSt.setString(1, uuid);
                 prepSt.setString(2, pair.getKey().name());
@@ -152,7 +158,8 @@ public class SqlStorage implements Storage {
                 prepSt.addBatch();
             }
             prepSt.executeBatch();
-        }
+            return null;
+        });
     }
 
     private void readContacts(Resume resume, ResultSet resultSet) throws SQLException {

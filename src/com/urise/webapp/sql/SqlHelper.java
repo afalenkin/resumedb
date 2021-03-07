@@ -50,6 +50,10 @@ public class SqlHelper {
         }
     }
 
-
+    public void executeStatement(Connection connection, String statement, SqlExecutor executor) throws SQLException {
+        try (PreparedStatement prepSt = connection.prepareStatement(statement)) {
+            executor.execute(prepSt);
+        }
+    }
 }
 
