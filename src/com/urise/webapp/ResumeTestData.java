@@ -1,16 +1,7 @@
 package com.urise.webapp;
 
 import com.urise.webapp.model.ContactType;
-import com.urise.webapp.model.Organization;
 import com.urise.webapp.model.Resume;
-import com.urise.webapp.model.SectionType;
-import com.urise.webapp.model.sections.ListSection;
-import com.urise.webapp.model.sections.OrganizationSection;
-import com.urise.webapp.model.sections.Section;
-import com.urise.webapp.model.sections.TextSection;
-
-import java.time.Month;
-import java.util.List;
 
 public class ResumeTestData {
     public static void main(String[] args) {
@@ -35,7 +26,7 @@ public class ResumeTestData {
         result.addContact(ContactType.LINKEDIN, "https://www.linkedin.com/in/gkislin");
         result.addContact(ContactType.STACKOVFLW, "https://stackoverflow.com/users/548473");
 
-        Section objective = new TextSection("Ведущий стажировок и корпоративного обучения по Java Web и Enterprise технологиям");
+        /*Section objective = new TextSection("Ведущий стажировок и корпоративного обучения по Java Web и Enterprise технологиям");
         Section personal = new TextSection("Аналитический склад ума, сильная логика, креативность, инициативность. Пурист кода и архитектуры.");
 
         Section achievments = new ListSection(List.of(("С 2013 года: разработка проектов \"Разработка Web приложения\",\"Java Enterprise\", " +
@@ -73,7 +64,7 @@ public class ResumeTestData {
         result.addSection(SectionType.QUALIFICATIONS, qualification);
         result.addSection(SectionType.ACHIEVEMENT, achievments);
         result.addSection(SectionType.EXPERIENCE, experience);
-        result.addSection(SectionType.EDUCATION, education);
+        result.addSection(SectionType.EDUCATION, education);*/
 
         return result;
     }

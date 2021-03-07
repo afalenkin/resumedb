@@ -34,6 +34,22 @@ public class SqlHelper {
         return new StorageException(e.getMessage(), e);
     }
 
+    public <T> T transactionalExecute(SqlTransaction<T> transExecutor) {
+        try (Connection connection = connectionFactory.getConnection()) {
+            try {
+                connection.setAutoCommit(false);
+                T result = transExecutor.execute(connection);
+                connection.commit();
+                return result;
+            } catch (SQLException e) {
+                connection.rollback();
+                throw switchException(e);
+            }
+        } catch (SQLException e) {
+            throw new StorageException(e.getMessage(), e);
+        }
+    }
+
 
 }
 

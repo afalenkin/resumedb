@@ -1,6 +1,7 @@
 package com.urise.webapp;
 
 import com.urise.webapp.storage.SqlStorage;
+import com.urise.webapp.storage.Storage;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,12 +12,12 @@ import java.util.Properties;
 public class Config {
     private static final File PROPS = new File("./config/resumes.properties");
     private static final Config INSTANCE = new Config();
-    private final Properties properties = new Properties();
     private final File storageDir;
-    private final SqlStorage dbStorage;
+    private final Storage dbStorage;
 
     private Config() {
         try (InputStream is = new FileInputStream(PROPS)) {
+            Properties properties = new Properties();
             properties.load(is);
             storageDir = new File(properties.getProperty("storage.dir"));
             dbStorage = new SqlStorage(properties.getProperty("db.url"), properties.getProperty("db.user"), properties.getProperty("db.password"));
@@ -33,11 +34,7 @@ public class Config {
         return storageDir;
     }
 
-    public Properties getProperties() {
-        return properties;
-    }
-
-    public SqlStorage getDbStorage() {
+    public Storage getDbStorage() {
         return dbStorage;
     }
 }
