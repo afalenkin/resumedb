@@ -89,7 +89,9 @@ public class SqlStorage implements Storage {
                     }
                     String fullName = resultSet.getString("full_name");
                     Resume result = new Resume(uuid, fullName);
-                    readContacts(result, resultSet);
+                    do {
+                        readContacts(result, resultSet);
+                    } while (resultSet.next());
                     return result;
                 });
     }
@@ -121,17 +123,19 @@ public class SqlStorage implements Storage {
             return null;
         });
 
-        for (Map.Entry<String, Resume> pair : allResume.entrySet()
-        ) {
-            helper.executeQuery("SELECT * FROM contact WHERE resume_uuid=?", (prepSr) -> {
-                prepSr.setString(1, pair.getKey());
-                ResultSet resultSet = prepSr.executeQuery();
-                if (resultSet.next()) {
-                    readContacts(pair.getValue(), resultSet);
-                }
-                return null;
-            });
-        }
+        //get all contacts from contact table
+        helper.executeQuery("SELECT * FROM contact", (prepSr) -> {
+            ResultSet resultSet = prepSr.executeQuery();
+            while (resultSet.next()) {
+
+                // define the uuid of the resume, on the cortege of which the cursor located
+                String currentResumeUuid = resultSet.getString("resume_uuid");
+
+                //read from db contacts for current resume
+                readContacts(allResume.get(currentResumeUuid), resultSet);
+            }
+            return null;
+        });
         return new ArrayList<>(allResume.values());
     }
 
@@ -148,9 +152,13 @@ public class SqlStorage implements Storage {
     }
 
     private void putContacts(Connection connection, Resume resume) throws SQLException {
+        Map<ContactType, String> contacts = resume.getContacts();
+        if (contacts.isEmpty() || contacts == null) {
+            return;
+        }
         String uuid = resume.getUuid();
         helper.executeStatement(connection, "INSERT INTO contact (resume_uuid, type, value) VALUES (?,?,?)", prepSt -> {
-            for (Map.Entry<ContactType, String> pair : resume.getContacts().entrySet()) {
+            for (Map.Entry<ContactType, String> pair : contacts.entrySet()) {
                 prepSt.setString(1, uuid);
                 prepSt.setString(2, pair.getKey().name());
                 prepSt.setString(3, pair.getValue());
@@ -162,11 +170,10 @@ public class SqlStorage implements Storage {
     }
 
     private void readContacts(Resume resume, ResultSet resultSet) throws SQLException {
-        do {
-            String value = resultSet.getString("value");
-            if (value == null) continue;
+        String value = resultSet.getString("value");
+        if (value != null) {
             ContactType conType = ContactType.valueOf(resultSet.getString("type"));
             resume.addContact(conType, value);
-        } while (resultSet.next());
+        }
     }
 }
