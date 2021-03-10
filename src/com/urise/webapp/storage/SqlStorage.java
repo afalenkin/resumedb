@@ -44,14 +44,12 @@ public class SqlStorage implements Storage {
                 return null;
             });
 
-            //delete all contacts for current resume
             helper.executeStatement(connection, "DELETE FROM contact c WHERE c.resume_uuid =?", prepSt -> {
                 prepSt.setString(1, uuid);
                 prepSt.execute();
                 return null;
             });
 
-            //insert new contacts for current resume
             putContacts(connection, resume);
             return null;
         });
