@@ -2,6 +2,12 @@ package com.urise.webapp;
 
 import com.urise.webapp.model.ContactType;
 import com.urise.webapp.model.Resume;
+import com.urise.webapp.model.SectionType;
+import com.urise.webapp.model.sections.ListSection;
+import com.urise.webapp.model.sections.Section;
+import com.urise.webapp.model.sections.TextSection;
+
+import java.util.List;
 
 public class ResumeTestData {
     public static void main(String[] args) {
@@ -26,7 +32,7 @@ public class ResumeTestData {
         result.addContact(ContactType.LINKEDIN, "https://www.linkedin.com/in/gkislin");
         result.addContact(ContactType.STACKOVFLW, "https://stackoverflow.com/users/548473");
 
-        /*Section objective = new TextSection("Ведущий стажировок и корпоративного обучения по Java Web и Enterprise технологиям");
+        Section objective = new TextSection("Ведущий стажировок и корпоративного обучения по Java Web и Enterprise технологиям");
         Section personal = new TextSection("Аналитический склад ума, сильная логика, креативность, инициативность. Пурист кода и архитектуры.");
 
         Section achievments = new ListSection(List.of(("С 2013 года: разработка проектов \"Разработка Web приложения\",\"Java Enterprise\", " +
@@ -42,7 +48,7 @@ public class ResumeTestData {
                 ("Version control: Subversion, Git, Mercury, ClearCase, Perforce"),
                 "DB: PostgreSQL(наследование, pgplsql, PL/Python), Redis (Jedis), H2, Oracle,"));
 
-        Organization jops = new Organization("Java Online Projects", "http://javaops.ru/", new Organization.Position(2013, Month.OCTOBER, "Автор проекта.", "Создание, организация и проведение Java онлайн проектов и стажировок."));
+        /*Organization jops = new Organization("Java Online Projects", "http://javaops.ru/", new Organization.Position(2013, Month.OCTOBER, "Автор проекта.", "Создание, организация и проведение Java онлайн проектов и стажировок."));
         Organization wrike = new Organization("Wrike", "https://www.wrike.com/", new Organization.Position(2014, Month.OCTOBER, 2016, Month.JANUARY,
                 "Старший разработчик (backend)", "Проектирование и разработка онлайн платформы управления проектами Wrike..."));
         Organization withEmptyLink = new Organization("EmptyLink", null, new Organization.Position(2014, Month.OCTOBER, 2016, Month.JANUARY,
@@ -57,14 +63,14 @@ public class ResumeTestData {
         Organization spbu = new Organization("Санкт-Петербургский национальный исследовательский университет информационных технологий, механики и оптики",
                 "http://www.ifmo.ru/", new Organization.Position(1993, Month.SEPTEMBER, 1996, Month.JULY, "Аспирантура (программист С, С++)", null),
                 new Organization.Position(1987, Month.SEPTEMBER, 1993, Month.JULY, "Инженер (программист Fortran, C)", null));
-        Section education = new OrganizationSection(List.of(withoutUrl, coursera, spbu));
+        Section education = new OrganizationSection(List.of(withoutUrl, coursera, spbu));*/
 
         result.addSection(SectionType.OBJECTIVE, objective);
         result.addSection(SectionType.PERSONAL, personal);
         result.addSection(SectionType.QUALIFICATIONS, qualification);
         result.addSection(SectionType.ACHIEVEMENT, achievments);
-        result.addSection(SectionType.EXPERIENCE, experience);
-        result.addSection(SectionType.EDUCATION, education);*/
+        //result.addSection(SectionType.EXPERIENCE, experience);
+        //result.addSection(SectionType.EDUCATION, education);
 
         return result;
     }
