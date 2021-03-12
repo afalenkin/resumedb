@@ -1,7 +1,7 @@
 package com.urise.webapp.web;
 
+import com.urise.webapp.Config;
 import com.urise.webapp.model.Resume;
-import com.urise.webapp.storage.SqlStorage;
 import com.urise.webapp.storage.Storage;
 
 import javax.servlet.ServletException;
@@ -14,8 +14,7 @@ import java.util.List;
 
 public class ResumeServlet extends HttpServlet {
 
-    private Storage storage = new SqlStorage("jdbc:postgresql://localhost:5432/resumes", "postgres", "postgres");
-    static final String JDBC_DRIVER = "org.postgresql.Driver";
+    private Storage storage = Config.get().getDbStorage();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -23,11 +22,6 @@ public class ResumeServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         response.setContentType("text/html; charset=UTF-8");
 
-        try {
-            Class.forName(JDBC_DRIVER);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
         PrintWriter writer = response.getWriter();
         String uuid = request.getParameter("name");
         if (uuid == null) {
@@ -35,7 +29,6 @@ public class ResumeServlet extends HttpServlet {
         } else {
             printResume(writer, uuid);
         }
-
     }
 
     @Override

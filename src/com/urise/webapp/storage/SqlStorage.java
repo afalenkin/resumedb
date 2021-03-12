@@ -1,6 +1,7 @@
 package com.urise.webapp.storage;
 
 import com.urise.webapp.exception.NotExistStorageException;
+import com.urise.webapp.exception.StorageException;
 import com.urise.webapp.model.ContactType;
 import com.urise.webapp.model.Resume;
 import com.urise.webapp.model.SectionType;
@@ -19,8 +20,14 @@ import java.util.logging.Logger;
 public class SqlStorage implements Storage {
     private static final Logger LOG = Logger.getLogger(SqlStorage.class.getName());
     private final SqlHelper helper;
+    static final String JDBC_DRIVER = "org.postgresql.Driver";
 
     public SqlStorage(String dbUrl, String dbUser, String dbPassword) {
+        try {
+            Class.forName(JDBC_DRIVER);
+        } catch (ClassNotFoundException e) {
+            throw new StorageException(e.getMessage(), e);
+        }
         helper = new SqlHelper(() -> DriverManager.getConnection(dbUrl, dbUser, dbPassword));
     }
 
