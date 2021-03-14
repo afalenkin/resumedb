@@ -188,7 +188,7 @@ public class SqlStorage implements Storage {
 
     private void putContacts(Connection connection, Resume resume) throws SQLException {
         Map<ContactType, String> contacts = resume.getContacts();
-        if (contacts.isEmpty() || contacts == null) {
+        if (contacts.isEmpty()) {
             return;
         }
         String uuid = resume.getUuid();
@@ -206,7 +206,7 @@ public class SqlStorage implements Storage {
 
     private void putSections(Connection connection, Resume resume) throws SQLException {
         Map<SectionType, Section> sections = resume.getSections();
-        if (sections.isEmpty() || sections == null) {
+        if (sections.isEmpty() ) {
             return;
         }
         String uuid = resume.getUuid();
