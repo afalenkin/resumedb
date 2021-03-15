@@ -1,18 +1,28 @@
 package com.urise.webapp;
 
 import com.urise.webapp.model.ContactType;
+import com.urise.webapp.model.Organization;
 import com.urise.webapp.model.Resume;
 import com.urise.webapp.model.SectionType;
 import com.urise.webapp.model.sections.ListSection;
+import com.urise.webapp.model.sections.OrganizationSection;
 import com.urise.webapp.model.sections.Section;
 import com.urise.webapp.model.sections.TextSection;
 
+import java.time.Month;
 import java.util.List;
+import java.util.UUID;
 
-public class ResumeTestData {
-    public static void main(String[] args) {
-        System.out.println(newResume("1", "Григорий Кислин"));
-    }
+public class TestData {
+    public static final String UUID_1 = UUID.randomUUID().toString();
+    public static final String UUID_2 = UUID.randomUUID().toString();
+    public static final String UUID_3 = UUID.randomUUID().toString();
+
+    public static final Resume RESUME_1 = newResume(UUID_1, "Zack");
+    public static final Resume RESUME_2 = newResume(UUID_2, "Arnold");
+    public static final Resume RESUME_3 = newResume(UUID_3, "Arnold");
+    public static final Resume RESUME_4 = newResume("Jorge");
+    public static final Resume RESUME_5 = newResume("Gregory");
 
     public static Resume newResume(String uuid, String fullName) {
         Resume resume = new Resume(uuid, fullName);
@@ -48,7 +58,7 @@ public class ResumeTestData {
                 ("Version control: Subversion, Git, Mercury, ClearCase, Perforce"),
                 "DB: PostgreSQL(наследование, pgplsql, PL/Python), Redis (Jedis), H2, Oracle,"));
 
-        /*Organization jops = new Organization("Java Online Projects", "http://javaops.ru/", new Organization.Position(2013, Month.OCTOBER, "Автор проекта.", "Создание, организация и проведение Java онлайн проектов и стажировок."));
+        Organization jops = new Organization("Java Online Projects", "http://javaops.ru/", new Organization.Position(2013, Month.OCTOBER, "Автор проекта.", "Создание, организация и проведение Java онлайн проектов и стажировок."));
         Organization wrike = new Organization("Wrike", "https://www.wrike.com/", new Organization.Position(2014, Month.OCTOBER, 2016, Month.JANUARY,
                 "Старший разработчик (backend)", "Проектирование и разработка онлайн платформы управления проектами Wrike..."));
         Organization withEmptyLink = new Organization("EmptyLink", null, new Organization.Position(2014, Month.OCTOBER, 2016, Month.JANUARY,
@@ -63,14 +73,14 @@ public class ResumeTestData {
         Organization spbu = new Organization("Санкт-Петербургский национальный исследовательский университет информационных технологий, механики и оптики",
                 "http://www.ifmo.ru/", new Organization.Position(1993, Month.SEPTEMBER, 1996, Month.JULY, "Аспирантура (программист С, С++)", null),
                 new Organization.Position(1987, Month.SEPTEMBER, 1993, Month.JULY, "Инженер (программист Fortran, C)", null));
-        Section education = new OrganizationSection(List.of(withoutUrl, coursera, spbu));*/
+        Section education = new OrganizationSection(List.of(withoutUrl, coursera, spbu));
 
         result.addSection(SectionType.OBJECTIVE, objective);
         result.addSection(SectionType.PERSONAL, personal);
         result.addSection(SectionType.QUALIFICATIONS, qualification);
         result.addSection(SectionType.ACHIEVEMENT, achievments);
-        //result.addSection(SectionType.EXPERIENCE, experience);
-        //result.addSection(SectionType.EDUCATION, education);
+        result.addSection(SectionType.EXPERIENCE, experience);
+        result.addSection(SectionType.EDUCATION, education);
 
         return result;
     }

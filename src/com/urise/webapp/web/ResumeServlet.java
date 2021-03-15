@@ -30,7 +30,7 @@ public class ResumeServlet extends HttpServlet {
         response.setContentType("text/html; charset=UTF-8");
 
         PrintWriter writer = response.getWriter();
-        String uuid = request.getParameter("name");
+        String uuid = request.getParameter("uuid");
         if (uuid == null) {
             printResumeTable(writer);
         } else {
@@ -78,7 +78,8 @@ public class ResumeServlet extends HttpServlet {
                 "<table>\n" +
                 "  <tr>\n");
         writer.println("<tr>\n<th>" + "Resume UUID </th>\n<th> Resumes owner fullname </th>\n</tr>\n");
-        resumes.forEach(resume -> writer.println("<tr>\n<th>" + resume.getUuid() + "</th>\n<th>" + resume.getFullName() +
+        resumes.forEach(resume -> writer.println("<tr>\n<th>" + "<a href=\"resume?uuid=" + resume.getUuid() +
+                "\">" + resume.getUuid() + "</a>" + "</th>\n<th>" + resume.getFullName() +
                 "</th>\n</tr>\n"));
         writer.println(
                 "</table>\n" +
@@ -86,4 +87,5 @@ public class ResumeServlet extends HttpServlet {
                         "</body>\n" +
                         "</html>");
     }
+
 }

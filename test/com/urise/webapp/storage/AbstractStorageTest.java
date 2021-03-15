@@ -1,7 +1,6 @@
 package com.urise.webapp.storage;
 
 import com.urise.webapp.Config;
-import com.urise.webapp.ResumeTestData;
 import com.urise.webapp.exception.ExistStorageException;
 import com.urise.webapp.exception.NotExistStorageException;
 import com.urise.webapp.model.ContactType;
@@ -14,20 +13,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.UUID;
+
+import static com.urise.webapp.TestData.*;
 
 public abstract class AbstractStorageTest {
     protected static File STORAGE_DIR = Config.get().getStorageDir();
     protected Storage storage;
-    private static final String UUID_1 = UUID.randomUUID().toString();
-    private static final String UUID_2 = UUID.randomUUID().toString();
-    private static final String UUID_3 = UUID.randomUUID().toString();
 
-    private static final Resume RESUME_1 = ResumeTestData.newResume(UUID_1, "Zack");
-    private static final Resume RESUME_2 = ResumeTestData.newResume(UUID_2, "Arnold");
-    private static final Resume RESUME_3 = ResumeTestData.newResume(UUID_3, "Arnold");
-    private static final Resume RESUME_4 = ResumeTestData.newResume("Jorge");
-    private static final Resume RESUME_5 = ResumeTestData.newResume("Gregory");
 
     protected AbstractStorageTest(Storage storage) {
         this.storage = storage;
