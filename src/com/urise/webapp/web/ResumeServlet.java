@@ -1,6 +1,7 @@
 package com.urise.webapp.web;
 
 import com.urise.webapp.Config;
+import com.urise.webapp.model.ContactType;
 import com.urise.webapp.model.Resume;
 import com.urise.webapp.storage.Storage;
 
@@ -10,8 +11,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.List;
 
 public class ResumeServlet extends HttpServlet {
 
@@ -25,67 +24,54 @@ public class ResumeServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.setCharacterEncoding("UTF-8");
-        response.setCharacterEncoding("UTF-8");
-        response.setContentType("text/html; charset=UTF-8");
-
-        PrintWriter writer = response.getWriter();
         String uuid = request.getParameter("uuid");
-        if (uuid == null) {
-            printResumeTable(writer);
-        } else {
-            printResume(writer, uuid);
+        String action = request.getParameter("action");
+
+        if (action == null) {
+            request.setAttribute("resumes", storage.getAllSorted());
+            request.getRequestDispatcher("/WEB-INF/jsp/list.jsp").forward(request, response);
+            return;
         }
+
+        Resume resume;
+        switch (action) {
+            case "delete":
+                storage.delete(uuid);
+                response.sendRedirect("resume");
+                return;
+            case "view":
+            case "edit":
+                resume = storage.get(uuid);
+                break;
+            default: {
+                throw new IllegalArgumentException("Action " + action + " is illegal");
+            }
+        }
+            request.setAttribute("resume", resume);
+        request.getRequestDispatcher("view".equals(action) ?
+                "/WEB-INF/jsp/view.jsp" : "/WEB-INF/jsp/edit.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+        String uuid = request.getParameter("uuid");
+        String fullName = request.getParameter("fullName");
+        Resume resume = storage.get(uuid);
+        resume.setFullName(fullName);
 
-    }
+        for (ContactType contactType: ContactType.values()) {
+            String value = request.getParameter(contactType.name());
+            if (value!=null && value.trim().length()!=0) {
+                resume.addContact(contactType, value);
+            } else {
+                resume.getContacts().remove(contactType);
+            }
+        }
 
-    private void printResume(PrintWriter writer, String uuid) {
-        Resume currentResume = storage.get(uuid);
-        writer.println(currentResume.toString());
-    }
+        storage.update(resume);
+        response.sendRedirect("resume");
 
-    private void printResumeTable(PrintWriter writer) {
-        List<Resume> resumes = storage.getAllSorted();
-        writer.println("<!DOCTYPE html>\n" +
-                "<html>\n" +
-                "<head>\n" +
-                "<style>\n" +
-                "table {\n" +
-                "  font-family: arial, sans-serif;\n" +
-                "  border-collapse: collapse;\n" +
-                "  width: 100%;\n" +
-                "}\n" +
-                "\n" +
-                "td, th {\n" +
-                "  border: 1px solid #dddddd;\n" +
-                "  text-align: left;\n" +
-                "  padding: 8px;\n" +
-                "}\n" +
-                "\n" +
-                "tr:nth-child(even) {\n" +
-                "  background-color: #dddddd;\n" +
-                "}\n" +
-                "</style>\n" +
-                "</head>\n" +
-                "<body>\n" +
-                "\n" +
-                "<h2>All resumes in database</h2>\n" +
-                "\n" +
-                "<table>\n" +
-                "  <tr>\n");
-        writer.println("<tr>\n<th>" + "Resume UUID </th>\n<th> Resumes owner fullname </th>\n</tr>\n");
-        resumes.forEach(resume -> writer.println("<tr>\n<th>" + "<a href=\"resume?uuid=" + resume.getUuid() +
-                "\">" + resume.getUuid() + "</a>" + "</th>\n<th>" + resume.getFullName() +
-                "</th>\n</tr>\n"));
-        writer.println(
-                "</table>\n" +
-                        "\n" +
-                        "</body>\n" +
-                        "</html>");
     }
 
 }
