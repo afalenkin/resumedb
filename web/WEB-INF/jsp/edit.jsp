@@ -32,7 +32,6 @@
                 <dd><input type="text" name="${type.name()}" size=30 value="${resume.getContact(type)}"></dd>
             </dl>
         </c:forEach>
-
         <h3>Секции:</h3>
         <c:forEach var="sectionType" items="<%=SectionType.values()%>">
             <c:set var="section" value="${resume.getSection(sectionType)}"/>
@@ -57,7 +56,7 @@
                     </c:when>
 
                     <c:when test="${sectionType == SectionType.EXPERIENCE || sectionType == SectionType.EDUCATION}">
-
+                        <h3>${sectionType.title}</h3>
                         <c:forEach var="organization" items="<%=((OrganizationSection) section).getOrganizations()%>"
                                    varStatus="counter">
                             <dl>

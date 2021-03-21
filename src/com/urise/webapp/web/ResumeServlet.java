@@ -58,15 +58,19 @@ public class ResumeServlet extends HttpServlet {
                 resume = storage.get(uuid);
                 for (SectionType type : SectionType.values()) {
                     Section currentSection = resume.getSection(type);
-                    if (currentSection == null) {
+
                         switch (type) {
                             case PERSONAL:
                             case OBJECTIVE:
-                                currentSection = new TextSection("");
+                                if (currentSection == null) {
+                                    currentSection = new TextSection("");
+                                }
                                 break;
                             case ACHIEVEMENT:
                             case QUALIFICATIONS:
-                                currentSection = new ListSection(new ArrayList<>());
+                                if (currentSection == null) {
+                                    currentSection = new ListSection(new ArrayList<>());
+                                }
                                 break;
                             case EDUCATION:
                             case EXPERIENCE:
@@ -86,7 +90,7 @@ public class ResumeServlet extends HttpServlet {
                         }
                         resume.addSection(type, currentSection);
                     }
-                }
+
                 break;
             }
             default: {
