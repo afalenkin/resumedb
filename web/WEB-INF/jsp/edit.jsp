@@ -40,33 +40,37 @@
             <dl>
                 <c:choose>
 
-                <c:when test="${sectionType == SectionType.PERSONAL || sectionType == SectionType.OBJECTIVE}">
-                    <dl>
-                        <dt>${sectionType.title}</dt>
-                        <dd><textarea name="${sectionType}" rows=10 cols=100>${section}</textarea></dd>
-                    </dl>
-                </c:when>
-
-                <c:when test="${sectionType == SectionType.ACHIEVEMENT || sectionType == SectionType.QUALIFICATIONS}">
-                    <dl>
-                        <dt>${sectionType.title}</dt>
-                        <dd><textarea name="${sectionType}" rows=10 cols=100><%=(String.join("\n",((ListSection) section).getItems()))%></textarea></dd>
-                    </dl>
-                </c:when>
-
-                <c:when test="${sectionType == SectionType.EXPERIENCE || sectionType == SectionType.EDUCATION}">
-
-                    <c:forEach var="organization" items="<%=((OrganizationSection) section).getOrganizations()%>" varStatus="counter">
+                    <c:when test="${sectionType == SectionType.PERSONAL || sectionType == SectionType.OBJECTIVE}">
                         <dl>
-                            <dt>Наименование:</dt>
-                            <dd><input type="text" name='${sectionType}' size=100 value="${organization.homePage.name}"></dd>
+                            <dt>${sectionType.title}</dt>
+                            <dd><textarea name="${sectionType}" rows=10 cols=100>${section}</textarea></dd>
                         </dl>
+                    </c:when>
+
+                    <c:when test="${sectionType == SectionType.ACHIEVEMENT || sectionType == SectionType.QUALIFICATIONS}">
                         <dl>
-                            <dt>URL:</dt>
-                            <dd><input type="text" name='${sectionType}link' size=100 value="${organization.homePage.url}"></dd>
+                            <dt>${sectionType.title}</dt>
+                            <dd><textarea name="${sectionType}" rows=10
+                                          cols=100><%=(String.join("\n", ((ListSection) section).getItems()))%></textarea>
                             </dd>
                         </dl>
-                        <br>
+                    </c:when>
+
+                    <c:when test="${sectionType == SectionType.EXPERIENCE || sectionType == SectionType.EDUCATION}">
+
+                        <c:forEach var="organization" items="<%=((OrganizationSection) section).getOrganizations()%>"
+                                   varStatus="counter">
+                            <dl>
+                                <dt>Наименование:</dt>
+                                <dd><input type="text" name='${sectionType}' size=100
+                                           value="${organization.homePage.name}"></dd>
+                            </dl>
+                            <dl>
+                                <dt>URL:</dt>
+                                <dd><input type="text" name='${sectionType}link' size=100
+                                           value="${organization.homePage.url}"></dd>
+                                </dd>
+                            </dl>
 
                             <c:forEach var="position" items="${organization.positions}">
                                 <jsp:useBean id="position" type="com.urise.webapp.model.Organization.Position"/>
@@ -74,14 +78,16 @@
                                     <dt>Дата начала:</dt>
                                     <dd>
                                         <input type="text" name="${sectionType}${counter.index}startDate" size=20
-                                               value="<%=DateUtil.notNullDate(position.getStartDate())%>" placeholder="MM-yyyy">
+                                               value="<%=DateUtil.notNullDate(position.getStartDate())%>"
+                                               placeholder="MM-yyyy">
                                     </dd>
                                 </dl>
                                 <dl>
                                     <dt>Дата окончания:</dt>
                                     <dd>
                                         <input type="text" name="${sectionType}${counter.index}endDate" size=20
-                                               value="<%=DateUtil.notNullDate(position.getEndDate())%>" placeholder="MM-yyyy">
+                                               value="<%=DateUtil.notNullDate(position.getEndDate())%>"
+                                               placeholder="MM-yyyy">
                                 </dl>
                                 <dl>
                                     <dt>Позиция:</dt>
@@ -94,20 +100,19 @@
                                                   cols=100>${position.description}</textarea></dd>
                                 </dl>
                             </c:forEach>
-                    </c:forEach>
+                            <br>
+                        </c:forEach>
 
-                </c:when>
+                    </c:when>
                 </c:choose>
-
 
             </dl>
         </c:forEach>
         <hr>
 
         <button type="submit">Сохранить</button>
-        <button onclick="window.history.back()">Отменить</button>
+        <button type="reset" onclick="window.history.back()">Отменить</button>
     </form>
-
 
 </section>
 <jsp:include page="fragments/footer.jsp"/>

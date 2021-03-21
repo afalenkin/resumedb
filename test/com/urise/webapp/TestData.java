@@ -22,7 +22,7 @@ public class TestData {
     public static final Resume RESUME_2 = newResume(UUID_2, "Arnold");
     public static final Resume RESUME_3 = newResume(UUID_3, "Arnold");
     public static final Resume RESUME_4 = newResume("Jorge");
-    public static final Resume RESUME_5 = newResume("Gregory");
+    public static final Resume RESUME_5 = new Resume("Zukor");
 
     public static Resume newResume(String uuid, String fullName) {
         Resume resume = new Resume(uuid, fullName);

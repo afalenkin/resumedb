@@ -31,11 +31,12 @@ public abstract class AbstractStorageTest {
         storage.save(RESUME_1);
         storage.save(RESUME_2);
         storage.save(RESUME_3);
+        storage.save(RESUME_5);
     }
 
     @Test
     public void size() {
-        assertSize(3);
+        assertSize(4);
     }
 
     @Test
@@ -47,7 +48,7 @@ public abstract class AbstractStorageTest {
     @Test
     public void getAllSorted() {
         List<Resume> resumes = storage.getAllSorted();
-        List<Resume> expected = new ArrayList<>(List.of(RESUME_2, RESUME_3, RESUME_1));
+        List<Resume> expected = new ArrayList<>(List.of(RESUME_2, RESUME_3, RESUME_1, RESUME_5));
         expected.sort(Comparator.comparing(Resume::getFullName).thenComparing(Resume::getUuid));
         Assert.assertEquals(storage.size(), resumes.size());
         Assert.assertEquals(expected, resumes);

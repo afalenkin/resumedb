@@ -14,7 +14,7 @@
         <tr>
             <th>Имя</th>
             <th>Email</th>
-            <th> </th>
+            <th><a href="resume?action=add"><img src="img/add.png"></a></th>
             <th> </th>
         </tr>
         <c:forEach items="${resumes}" var="resume">
@@ -27,6 +27,7 @@
             </tr>
         </c:forEach>
     </table>
+    <br>
 </section>
 <jsp:include page="fragments/footer.jsp"/>
 </body>

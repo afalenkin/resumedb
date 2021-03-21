@@ -4,6 +4,7 @@ import com.urise.webapp.Config;
 import com.urise.webapp.model.*;
 import com.urise.webapp.model.sections.ListSection;
 import com.urise.webapp.model.sections.OrganizationSection;
+import com.urise.webapp.model.sections.Section;
 import com.urise.webapp.model.sections.TextSection;
 import com.urise.webapp.storage.Storage;
 import com.urise.webapp.util.DateUtil;
@@ -18,6 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ResumeServlet extends HttpServlet {
 
@@ -47,9 +49,46 @@ public class ResumeServlet extends HttpServlet {
                 response.sendRedirect("resume");
                 return;
             case "view":
-            case "edit":
                 resume = storage.get(uuid);
                 break;
+            case "add":
+                resume = Resume.getNewResume();
+                break;
+            case "edit": {
+                resume = storage.get(uuid);
+                for (SectionType type : SectionType.values()) {
+                    Section currentSection = resume.getSection(type);
+                    if (currentSection == null) {
+                        switch (type) {
+                            case PERSONAL:
+                            case OBJECTIVE:
+                                currentSection = new TextSection("");
+                                break;
+                            case ACHIEVEMENT:
+                            case QUALIFICATIONS:
+                                currentSection = new ListSection(new ArrayList<>());
+                                break;
+                            case EDUCATION:
+                            case EXPERIENCE:
+                                OrganizationSection organizations = (OrganizationSection) currentSection;
+                                List<Organization> emptyOrganizations = new ArrayList<>();
+                                emptyOrganizations.add(new Organization("", "", new Organization.Position()));
+                                if (organizations != null) {
+                                    for (Organization org : organizations.getOrganizations()) {
+                                        List<Organization.Position> positions = new ArrayList<>();
+                                        positions.add(new Organization.Position());
+                                        positions.addAll(org.getPositions());
+                                        emptyOrganizations.add(new Organization(org.getHomePage(), positions));
+                                    }
+                                }
+                                currentSection = new OrganizationSection(emptyOrganizations);
+                                break;
+                        }
+                        resume.addSection(type, currentSection);
+                    }
+                }
+                break;
+            }
             default: {
                 throw new IllegalArgumentException("Action " + action + " is illegal");
             }
@@ -93,7 +132,10 @@ public class ResumeServlet extends HttpServlet {
                 }
                 case ACHIEVEMENT:
                 case QUALIFICATIONS: {
-                    resume.addSection(sectionType, new ListSection(Arrays.asList(value.split("\n"))));
+                    List<String> sectionItems = readItems(value);
+                    if (sectionItems != null) {
+                        resume.addSection(sectionType, new ListSection(readItems(value)));
+                    }
                     break;
                 }
                 case EXPERIENCE:
@@ -131,5 +173,10 @@ public class ResumeServlet extends HttpServlet {
         }
         storage.update(resume);
         response.sendRedirect("resume");
+    }
+
+    private List<String> readItems(String value) {
+        if (value.isEmpty() || value.trim().length() < 0 || value == null) return null;
+        return Arrays.stream(value.split("\n")).filter(row -> row.trim().length() > 0).collect(Collectors.toList());
     }
 }

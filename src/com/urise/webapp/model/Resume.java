@@ -1,15 +1,17 @@
 package com.urise.webapp.model;
 
+import com.urise.webapp.model.sections.ListSection;
+import com.urise.webapp.model.sections.OrganizationSection;
 import com.urise.webapp.model.sections.Section;
+import com.urise.webapp.model.sections.TextSection;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
+
+import static com.urise.webapp.model.SectionType.*;
 
 /**
  * Initial resume class
@@ -23,6 +25,17 @@ public class Resume implements Comparable<Resume>, Serializable {
     private String fullName;
     private final Map<ContactType, String> contacts = new EnumMap<>(ContactType.class);
     private final Map<SectionType, Section> sections = new EnumMap<>(SectionType.class);
+
+    private final static Resume NEW_RESUME = new Resume("");
+
+    static {
+        NEW_RESUME.addSection(PERSONAL, new TextSection(""));
+        NEW_RESUME.addSection(OBJECTIVE, new TextSection(""));
+        NEW_RESUME.addSection(ACHIEVEMENT, new ListSection(new ArrayList<>()));
+        NEW_RESUME.addSection(QUALIFICATIONS, new ListSection(new ArrayList<>()));
+        NEW_RESUME.addSection(EXPERIENCE, new OrganizationSection(List.of(new Organization("", "", new Organization.Position()))));
+        NEW_RESUME.addSection(EDUCATION, new OrganizationSection(List.of(new Organization("", "", new Organization.Position()))));
+    }
 
     public Resume(String fullName) {
         this(UUID.randomUUID().toString(), fullName);
@@ -85,6 +98,10 @@ public class Resume implements Comparable<Resume>, Serializable {
 
         }
         return result.toString();
+    }
+
+    public static Resume getNewResume() {
+        return NEW_RESUME;
     }
 
     @Override
