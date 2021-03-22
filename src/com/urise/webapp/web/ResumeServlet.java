@@ -51,9 +51,10 @@ public class ResumeServlet extends HttpServlet {
             case "view":
                 resume = storage.get(uuid);
                 break;
-            case "add":
+            case "add": {
                 resume = Resume.getNewResume();
                 break;
+            }
             case "edit": {
                 resume = storage.get(uuid);
                 for (SectionType type : SectionType.values()) {
@@ -107,8 +108,21 @@ public class ResumeServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         String uuid = request.getParameter("uuid");
         String fullName = request.getParameter("fullName");
-        Resume resume = storage.get(uuid);
-        resume.setFullName(fullName);
+
+        // can not create or edit resume without full name
+        if (fullName.trim().isEmpty()){
+            response.sendRedirect("resume");
+            return;
+        }
+
+        boolean isNew = (uuid.isEmpty());
+        Resume resume;
+        if (isNew) {
+            resume = new Resume(fullName);
+        } else {
+            resume = storage.get(uuid);
+            resume.setFullName(fullName);
+        }
 
         // fill resume contacts from web-page
         for (ContactType contactType : ContactType.values()) {
@@ -175,7 +189,11 @@ public class ResumeServlet extends HttpServlet {
                 }
             }
         }
-        storage.update(resume);
+           if (isNew){
+               storage.save(resume);
+           } else {
+               storage.update(resume);
+           }
         response.sendRedirect("resume");
     }
 

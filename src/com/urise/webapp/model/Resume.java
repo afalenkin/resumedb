@@ -26,9 +26,11 @@ public class Resume implements Comparable<Resume>, Serializable {
     private final Map<ContactType, String> contacts = new EnumMap<>(ContactType.class);
     private final Map<SectionType, Section> sections = new EnumMap<>(SectionType.class);
 
+    //resume for WEB
     private final static Resume NEW_RESUME = new Resume("");
 
     static {
+        NEW_RESUME.uuid = "";
         NEW_RESUME.addSection(PERSONAL, new TextSection(""));
         NEW_RESUME.addSection(OBJECTIVE, new TextSection(""));
         NEW_RESUME.addSection(ACHIEVEMENT, new ListSection(new ArrayList<>()));

@@ -1,6 +1,5 @@
 <%@ page import="com.urise.webapp.model.ContactType" %>
 <%@ page import="com.urise.webapp.model.SectionType" %>
-<%@ page import="com.urise.webapp.util.HtmlUtil" %>
 <%@ page import="com.urise.webapp.model.sections.ListSection" %>
 <%@ page import="com.urise.webapp.model.sections.OrganizationSection" %>
 <%@ page import="com.urise.webapp.util.DateUtil" %>
