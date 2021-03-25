@@ -52,7 +52,7 @@ public class ResumeServlet extends HttpServlet {
                 resume = storage.get(uuid);
                 break;
             case "add": {
-                resume = Resume.getNewResume();
+                resume = Resume.getEmptyResume();
                 break;
             }
             case "edit": {

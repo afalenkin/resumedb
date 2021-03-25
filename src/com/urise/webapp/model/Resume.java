@@ -27,16 +27,16 @@ public class Resume implements Comparable<Resume>, Serializable {
     private final Map<SectionType, Section> sections = new EnumMap<>(SectionType.class);
 
     //resume for WEB
-    private final static Resume NEW_RESUME = new Resume("");
+    private final static Resume EMPTY = new Resume("");
 
     static {
-        NEW_RESUME.uuid = "";
-        NEW_RESUME.addSection(PERSONAL, new TextSection(""));
-        NEW_RESUME.addSection(OBJECTIVE, new TextSection(""));
-        NEW_RESUME.addSection(ACHIEVEMENT, new ListSection(new ArrayList<>()));
-        NEW_RESUME.addSection(QUALIFICATIONS, new ListSection(new ArrayList<>()));
-        NEW_RESUME.addSection(EXPERIENCE, new OrganizationSection(List.of(new Organization("", "", new Organization.Position()))));
-        NEW_RESUME.addSection(EDUCATION, new OrganizationSection(List.of(new Organization("", "", new Organization.Position()))));
+        EMPTY.uuid = "";
+        EMPTY.addSection(PERSONAL, new TextSection(""));
+        EMPTY.addSection(OBJECTIVE, new TextSection(""));
+        EMPTY.addSection(ACHIEVEMENT, new ListSection(new ArrayList<>()));
+        EMPTY.addSection(QUALIFICATIONS, new ListSection(new ArrayList<>()));
+        EMPTY.addSection(EXPERIENCE, new OrganizationSection(List.of(new Organization("", "", new Organization.Position()))));
+        EMPTY.addSection(EDUCATION, new OrganizationSection(List.of(new Organization("", "", new Organization.Position()))));
     }
 
     public Resume(String fullName) {
@@ -102,8 +102,8 @@ public class Resume implements Comparable<Resume>, Serializable {
         return result.toString();
     }
 
-    public static Resume getNewResume() {
-        return NEW_RESUME;
+    public static Resume getEmptyResume() {
+        return EMPTY;
     }
 
     @Override

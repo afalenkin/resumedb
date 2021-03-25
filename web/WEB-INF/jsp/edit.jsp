@@ -12,7 +12,7 @@
     <jsp:useBean id="resume" type="com.urise.webapp.model.Resume" scope="request"/>
     <title>Резюме ${resume.fullName}</title>
 </head>
-<body>
+<body style="background-color:LightGray;">
 <jsp:include page="fragments/header.jsp"/>
 <section>
 

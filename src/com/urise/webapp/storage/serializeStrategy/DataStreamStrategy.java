@@ -53,12 +53,17 @@ public class DataStreamStrategy implements SerializeStrategy {
         SectionType sectionType = section.getKey();
         write(dos, sectionType.name());
         switch (sectionType) {
-            case PERSONAL, OBJECTIVE -> write(dos, section.getValue().toString());
-            case ACHIEVEMENT, QUALIFICATIONS -> {
+            case PERSONAL:
+            case OBJECTIVE : write(dos, section.getValue().toString());
+            break;
+            case ACHIEVEMENT:
+            case QUALIFICATIONS : {
                 List<String> items = ((ListSection) section.getValue()).getItems();
                 write(dos, items.size(), items.toArray(String[]::new));
+                break;
             }
-            case EXPERIENCE, EDUCATION -> {
+            case EXPERIENCE:
+            case EDUCATION : {
                 List<Organization> organizations = ((OrganizationSection) section.getValue()).getOrganizations();
                 writeWithException(dos, organizations, (Organization o) -> {
 
@@ -70,6 +75,7 @@ public class DataStreamStrategy implements SerializeStrategy {
                     //link of the organization will be written after all positions
                     write(dos, o.getHomePage().getName(), getNoneIfNull(o.getHomePage().getUrl()));
                 });
+                break;
             }
         }
     }
@@ -93,13 +99,19 @@ public class DataStreamStrategy implements SerializeStrategy {
     private Section readSection(DataInputStream dis, SectionType sectionType) throws IOException {
         Section result = null;
         switch (sectionType) {
-            case PERSONAL, OBJECTIVE -> result = new TextSection(dis.readUTF());
-            case ACHIEVEMENT, QUALIFICATIONS -> {
+            case PERSONAL:
+            case OBJECTIVE:
+                result = new TextSection(dis.readUTF());
+                break;
+            case ACHIEVEMENT:
+            case QUALIFICATIONS : {
                 List<String> items = new ArrayList<>();
                 readWithException(dis, dataStream -> items.add(dataStream.readUTF()));
                 result = new ListSection(items);
+                break;
             }
-            case EXPERIENCE, EDUCATION -> {
+            case EXPERIENCE:
+            case EDUCATION : {
                 List<Organization> organizations = new ArrayList<>();
                 readWithException(dis, orgDataStream -> {
                     List<Organization.Position> positions = new ArrayList<>();
@@ -115,6 +127,7 @@ public class DataStreamStrategy implements SerializeStrategy {
                     organizations.add(new Organization(link, positions));
                 });
                 result = new OrganizationSection(organizations);
+                break;
             }
         }
         return result;

@@ -19,4 +19,7 @@ public class HtmlUtil {
         return (value == null || value.trim().length() == 0);
     }
 
+    public static String formatDates(Organization.Position position) {
+        return DateUtil.notNullDate(position.getStartDate()) + " - " + DateUtil.notNullDate(position.getEndDate());
+    }
 }

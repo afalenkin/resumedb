@@ -75,6 +75,7 @@ public class TestData {
                 new Organization.Position(1987, Month.SEPTEMBER, 1993, Month.JULY, "Инженер (программист Fortran, C)", null));
         Section education = new OrganizationSection(List.of(withoutUrl, coursera, spbu));
 
+
         result.addSection(SectionType.OBJECTIVE, objective);
         result.addSection(SectionType.PERSONAL, personal);
         result.addSection(SectionType.QUALIFICATIONS, qualification);

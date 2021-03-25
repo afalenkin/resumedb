@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 /**
  * gkislin
@@ -25,7 +26,11 @@ public class DateUtil {
     public static LocalDate parse(String value){
         if (value.equals("По настоящее время")) return DateUtil.NOW;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-yyyy");
-        YearMonth yearMonth = YearMonth.parse(value, formatter);
-        return LocalDate.of(yearMonth.getYear(), yearMonth.getMonth(), 1);
+        try {
+            YearMonth yearMonth = YearMonth.parse(value, formatter);
+            return LocalDate.of(yearMonth.getYear(), yearMonth.getMonth(), 1);
+        } catch (DateTimeParseException e) {
+            return DateUtil.NOW;
+        }
     }
 }

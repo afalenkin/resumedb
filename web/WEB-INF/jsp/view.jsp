@@ -1,11 +1,6 @@
-<%@ page import="com.urise.webapp.model.ContactType" %>
 <%@ page import="com.urise.webapp.util.HtmlUtil" %>
-<%@ page import="com.urise.webapp.model.SectionType" %>
-<%@ page import="com.urise.webapp.model.sections.Section" %>
 <%@ page import="com.urise.webapp.model.sections.ListSection" %>
-<%@ page import="java.util.stream.Collectors" %>
 <%@ page import="com.urise.webapp.model.sections.OrganizationSection" %>
-<%@ page import="com.urise.webapp.model.Organization" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <html>
@@ -15,11 +10,11 @@
     <jsp:useBean id="resume" type="com.urise.webapp.model.Resume" scope="request"/>
     <title>Резюме ${resume.fullName}</title>
 </head>
-<body>
+<body style="background-color:LightGray;">
 <jsp:include page="fragments/header.jsp"/>
 <section>
 
-    <h2>${resume.fullName}&nbsp;<a href="resume?uuid=${resume.uuid}&action=edit">Edit</a></h2>
+    <h1>${resume.fullName}&nbsp;<a href="resume?uuid=${resume.uuid}&action=edit"><img src="img/pencil.png"></a></h1>
     <p>
         <c:forEach var="contactEntry" items="${resume.contacts}">
             <jsp:useBean id="contactEntry"
@@ -27,54 +22,67 @@
                 <%=contactEntry.getKey().toHtml(contactEntry.getValue())%><br/>
         </c:forEach>
     <p>
-
-    <p>
+    <hr>
+    <table cellpadding="2">
         <c:forEach var="sectionEntry" items="${resume.sections}">
             <jsp:useBean id="sectionEntry"
                          type="java.util.Map.Entry<com.urise.webapp.model.SectionType, com.urise.webapp.model.sections.Section>"/>
-                <% SectionType sectionType = sectionEntry.getKey();
-                Section section = sectionEntry.getValue();
-        String sectionString = null;
-        switch (sectionType) {
-            case PERSONAL:
-            case OBJECTIVE:
-                sectionString = section.toString();
-                break;
-            case ACHIEVEMENT:
-            case QUALIFICATIONS:
-                sectionString = String.join(" </br> ", ((ListSection) section).getItems());
-                break;
-            case EDUCATION:
-            case EXPERIENCE: {
-                String headerOpen = "<h3>";
-                String headerClose = "</h3>";
-
-                StringBuffer buffer = new StringBuffer();
-                ((OrganizationSection) section).getOrganizations().forEach(organization -> {
-                    buffer.append(headerOpen).
-                            append(HtmlUtil.linkOrName(organization)).
-                            append(headerClose);
-
-                    organization.getPositions().forEach(position -> {
-                        buffer.append(headerOpen).append(position.getTitle()).
-                                append(" : с ").
-                                append(position.getStartDate()).
-                                append(" по ").
-                                append(position.getEndDate()).
-                                append(headerClose).
-                                append(HtmlUtil.notNull(position.getDescription())).
-                                append("<br/>");
-                    });
-                });
-                sectionString = buffer.toString();}}
-    %>
-
-    <h2><%=sectionType.getTitle()%>
-    </h2>
-    <%=sectionString%>
+            <c:set var="type" value="${sectionEntry.key}"/>
+            <c:set var="section" value="${sectionEntry.value}"/>
+            <jsp:useBean id="section" type="com.urise.webapp.model.sections.Section"/>
+            <tr>
+                <td colspan="2"><h2><a name="type.name">${type.title}</a></h2></td>
+            </tr>
+            <c:choose>
+                <c:when test="${type=='OBJECTIVE'}">
+                    <tr>
+                        <td colspan="2">
+                            <h3><%=(section)%>
+                            </h3>
+                        </td>
+                    </tr>
+                </c:when>
+                <c:when test="${type=='PERSONAL'}">
+                    <tr>
+                        <td colspan="2">
+                            <%=(section)%>
+                        </td>
+                    </tr>
+                </c:when>
+                <c:when test="${type=='QUALIFICATIONS' || type=='ACHIEVEMENT'}">
+                    <tr>
+                        <td colspan="2">
+                            <ul>
+                                <c:forEach var="item" items="<%=((ListSection) section).getItems()%>">
+                                    <li>${item}</li>
+                                </c:forEach>
+                            </ul>
+                        </td>
+                    </tr>
+                </c:when>
+                <c:when test="${type=='EXPERIENCE' || type=='EDUCATION'}">
+                    <c:forEach var="org" items="<%=((OrganizationSection) section).getOrganizations()%>">
+                        <tr>
+                            <td colspan="2">
+                                        <h3>${HtmlUtil.linkOrName(org)}</h3>
+                            </td>
+                        </tr>
+                        <c:forEach var="position" items="${org.positions}">
+                            <jsp:useBean id="position" type="com.urise.webapp.model.Organization.Position"/>
+                            <tr>
+                                <td width="15%" style="vertical-align: top"><%=HtmlUtil.formatDates(position)%>
+                                </td>
+                                <td><b>${position.title}</b><br>${HtmlUtil.notNull(position.description)}</td>
+                            </tr>
+                        </c:forEach>
+                    </c:forEach>
+                </c:when>
+            </c:choose>
+        </c:forEach>
+    </table>
     <br/>
-    </c:forEach>
-    <p>
+
+    <button onclick="window.history.back()">К списку резюме</button>
 
 </section>
 <jsp:include page="fragments/footer.jsp"/>
